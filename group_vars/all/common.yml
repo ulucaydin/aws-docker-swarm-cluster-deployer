@@ -1,0 +1,4 @@
+---
+cf_instance_type: t2.nano
+cf_region: us-west-2
+cf_cluster_size: 3

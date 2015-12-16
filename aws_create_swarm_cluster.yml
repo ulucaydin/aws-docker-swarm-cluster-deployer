@@ -1,0 +1,7 @@
+---
+
+# Create a Stack on Cloud Formation or Update if name already exists
+- hosts: localhost
+  connection: local
+  roles:
+  - create_cf_stack

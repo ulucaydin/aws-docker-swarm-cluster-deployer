@@ -1,0 +1,23 @@
+# Removal example
+
+- name: Get a new Discovery Service url
+  uri:
+    url: "https://discovery.etcd.io/new?size={{ cf_cluster_size }}"
+    return_content: yes
+  register: discovery_service_url
+
+- name: Create a new Stack using the given params and template
+  cloudformation:
+    state: "present"
+    stack_name: "{{ cf_stack_name }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    template: "roles/create_cf_stack/files/coreos-beta-hvm.template"
+    region: "{{ cf_region }}"
+    template_parameters:
+      InstanceType: "{{ cf_instance_type }}"
+      ClusterSize: "{{ cf_cluster_size }}"
+      KeyPair: "{{ aws_keypair }}"
+      DiscoveryURL: "{{ discovery_service_url.content }}"
+    tags:
+      Stack: "ansible-cloudformation"

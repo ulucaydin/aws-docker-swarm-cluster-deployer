@@ -1,0 +1,8 @@
+# Removal example
+- name: Tear Down the given Cloud Formation stack
+  cloudformation:
+    state: "absent"
+    stack_name: "{{ cf_stack_name }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    template: "roles/create_cf_stack/files/coreos-beta-hvm.template"
