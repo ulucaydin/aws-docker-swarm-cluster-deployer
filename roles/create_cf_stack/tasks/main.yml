@@ -1,4 +1,4 @@
-# Removal example
+---
 
 - name: Get a new Discovery Service url
   uri:
@@ -6,18 +6,33 @@
     return_content: yes
   register: discovery_service_url
 
+- set_fact:
+    master_cloud_config: "{{ lookup('template', '../templates/master-config-file.yml.j2') }}"
+    minion_cloud_config: "{{ lookup('template', '../templates/minion-config-file.yml.j2') }}"
+
+- name: Print master config file
+  debug: msg="{{ master_cloud_config }}"
+
+- name: Print minion config file
+  debug: msg="{{ minion_cloud_config }}"
+
 - name: Create a new Stack using the given params and template
   cloudformation:
     state: "present"
     stack_name: "{{ cf_stack_name }}"
     aws_access_key: "{{ aws_access_key }}"
     aws_secret_key: "{{ aws_secret_key }}"
-    template: "roles/create_cf_stack/files/coreos-beta-hvm.template"
+    template: "roles/create_cf_stack/files/coreos-beta-swarm-hvm.template"
     region: "{{ cf_region }}"
     template_parameters:
       InstanceType: "{{ cf_instance_type }}"
       ClusterSize: "{{ cf_cluster_size }}"
-      KeyPair: "{{ aws_keypair }}"
+      KeyName: "{{ aws_keypair }}"
+      UserDataMinion: "{{ minion_cloud_config | b64encode }}"
+      UserDataMaster: "{{ master_cloud_config | b64encode }}"
       DiscoveryURL: "{{ discovery_service_url.content }}"
     tags:
       Stack: "ansible-cloudformation"
+  register: stack_creation_response
+
+- debug: msg="{{ stack_creation_response }}"

@@ -1,7 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
   "Description": "CoreOS on EC2: http://coreos.com/docs/running-coreos/cloud-providers/ec2/",
-
   "Mappings" : {
       "RegionMap" : {
           "us-east-1" : {
@@ -17,7 +16,6 @@
           }
       }
   },
-
   "Parameters": {
     "InstanceType" : {
       "Description" : "EC2 HVM instance type (m3.medium, etc).",
@@ -56,7 +54,6 @@
       "Type" : "String"
     }
   },
-
   "Resources": {
     "CoreOSSecurityGroup": {
       "Type": "AWS::EC2::SecurityGroup",
@@ -111,11 +108,25 @@
         "InstanceType": {"Ref": "InstanceType"},
         "KeyName": {"Ref": "KeyPair"},
         "SecurityGroups": [{"Ref": "CoreOSSecurityGroup"}],
-        "UserData" : {"Ref": "UserData"}
+        "UserData" : { "Fn::Base64":
+          { "Fn::Join": [ "", [
+            "#cloud-config\n\n",
+            "coreos:\n",
+            "  etcd2:\n",
+            "    discovery: ", { "Ref": "DiscoveryURL" }, "\n",
+            "    advertise-client-urls: http://$", { "Ref": "AdvertisedIPAddress" }, "_ipv4:2379\n",
+            "    initial-advertise-peer-urls: http://$", { "Ref": "AdvertisedIPAddress" }, "_ipv4:2380\n",
+            "    listen-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001\n",
+            "    listen-peer-urls: http://$", { "Ref": "AdvertisedIPAddress" }, "_ipv4:2380\n",
+            "  units:\n",
+            "    - name: etcd2.service\n",
+            "      command: start\n",
+            "    - name: fleet.service\n",
+            "      command: start\n"
+            ] ]
+          }
+        }
       }
     }
-  },
-
-  "Outputs" : {
   }
 }
