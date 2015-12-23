@@ -31,8 +31,10 @@
       UserDataMinion: "{{ minion_cloud_config | b64encode }}"
       UserDataMaster: "{{ master_cloud_config | b64encode }}"
       DiscoveryURL: "{{ discovery_service_url.content }}"
+      VpcAvailabilityZones: "{{ cf_vpc_azs }}"
     tags:
       Stack: "ansible-cloudformation"
   register: stack_creation_response
 
-- debug: msg="{{ stack_creation_response }}"
+- name: Stack Output
+  debug: msg="{{ stack_creation_response.stack_outputs }}"
