@@ -226,6 +226,38 @@
       }
     },
 
+    "PublicLoadBalancerSecurityGroup" : {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "GroupDescription" : "Enable HTTP/HTTPS access on port 80/443 to 80/8080",
+        "VpcId" : { "Ref" : "Vpc" },
+        "SecurityGroupIngress" : [ {
+          "IpProtocol" : "tcp",
+          "FromPort" : "80",
+          "ToPort" : "80",
+          "CidrIp" : "0.0.0.0/0"
+        },
+        {
+          "IpProtocol" : "tcp",
+          "FromPort" : "443",
+          "ToPort" : "443",
+          "CidrIp" : "0.0.0.0/0"
+        } ],
+        "SecurityGroupEgress" : [ {
+          "IpProtocol" : "tcp",
+          "FromPort" : "80",
+          "ToPort" : "80",
+          "CidrIp" : "0.0.0.0/0"
+        },
+        {
+          "IpProtocol" : "tcp",
+          "FromPort" : "8080",
+          "ToPort" : "8080",
+          "CidrIp" : "0.0.0.0/0"
+        } ]
+      }
+    },
+
     "NodeIngress4243" : {
       "DependsOn" : "NodeCoreOSSecurityGroup",
       "Type" : "AWS::EC2::SecurityGroupIngress",
@@ -480,7 +512,32 @@
         }
       }
       }
+    },
+
+    "WebappLoadBalancer" : {
+      "Type" : "AWS::ElasticLoadBalancing::LoadBalancer",
+      "DependsOn" : "CoreOSServerAsg",
+      "Properties" : {
+        "LoadBalancerName" : {"Fn::Join" : ["-", ["webapp", { "Ref" : "Vpc" } ]]},
+        "CrossZone": true,
+        "SecurityGroups" : [ { "Ref" : "PublicLoadBalancerSecurityGroup" } ],
+        "Subnets" : [{ "Ref" : "PubSubnetAz1" }, { "Ref" : "PubSubnetAz2" }, { "Ref" : "PubSubnetAz3" }],
+        "Listeners" :
+          [ {
+            "LoadBalancerPort" : "80",
+            "InstancePort" : "80",
+            "Protocol" : "HTTP"
+          }],
+        "HealthCheck" : {
+          "Target" : { "Fn::Join" : [ "", ["HTTP:80", "/"]]},
+          "HealthyThreshold" : "5",
+          "UnhealthyThreshold" : "3",
+          "Interval" : "30",
+          "Timeout" : "5"
+        }
+      }
     }
+
   },
 
   "Outputs" : {
