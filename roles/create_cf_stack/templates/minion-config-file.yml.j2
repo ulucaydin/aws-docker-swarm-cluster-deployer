@@ -3,12 +3,14 @@
 coreos:
   etcd2:
     discovery: {{ discovery_service_url.content }}
-    advertise-client-urls: http://${{ advertised_ip_address }}_ipv4:2379,http://${{ advertised_ip_address }}:4001
+    advertise-client-urls: http://${{ advertised_ip_address }}_ipv4:2379
     initial-advertise-peer-urls: http://${{ advertised_ip_address }}_ipv4:2380
     listen-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
     listen-peer-urls: http://${{ advertised_ip_address }}_ipv4:2380
   units:
     - name: etcd2.service
+      command: start
+    - name: fleet.service
       command: start
     - name: docker-tcp.socket
       command: start
