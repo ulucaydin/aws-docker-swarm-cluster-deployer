@@ -401,45 +401,7 @@
           "SubnetId": { "Ref" : "PubSubnetAz1" },
           "GroupSet" : [ { "Ref" : "MasterCoreOSSecurityGroup" } ]
         } ],
-          "UserData" : { "Fn::Base64" :
-                    { "Fn::Join" : [ "", [
-                      "#cloud-config\n\n",
-                      "coreos:\n",
-                      "  etcd2:\n",
-                      "    discovery: ", { "Ref" : "DiscoveryURL" }, "\n",
-                      "    advertise-client-urls: http://$", { "Ref" : "AdvertisedIPAddress" }, "_ipv4:2379\n",
-                      "    initial-advertise-peer-urls: http://$", { "Ref" : "AdvertisedIPAddress" }, "_ipv4:2380\n",
-                      "    listen-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001\n",
-                      "    listen-peer-urls: http://$", { "Ref" : "AdvertisedIPAddress" }, "_ipv4:2380\n",
-                      "  units:\n",
-                      "    - name: docker-tcp.socket\n",
-                      "      command: start\n",
-                      "      enable: true\n",
-                      "      content: |\n",
-                      "        [Unit]\n",
-                      "        Description=Docker Socket for the API\n\n",
-                      "        [Socket]\n",
-                      "        ListenStream=4243\n",
-                      "        BindIPv6Only=both\n",
-                      "        Service=docker.service\n\n",
-                      "        [Install]\n",
-                      "        WantedBy=sockets.target\n",
-                      "    - name: etcd2.service\n",
-                      "      command: start\n",
-                      "    - name: fleet.service\n",
-                      "      command: start\n",
-                      "    - name: docker-swarm.service\n",
-                      "      command: start\n",
-                      "      content: |\n",
-                      "        [Unit]\n",
-                      "        Description=Swarm service\n",
-                      "        After=docker.service\n\n",
-                      "        [Service]\n",
-                      "        Restart=no\n",
-                      "        ExecStart=/usr/bin/docker run --name docker-swarm -d -p 2375:2375 swarm manage etcd://$", { "Ref" : "AdvertisedIPAddress" }, "_ipv4:2379/swarm\n"
-                      ] ]
-                    }
-                  },
+        "UserData" : { "Fn::Base64" : { "Ref" : "UserDataMaster" } },
         "Tags": [
           { "Key" : "Name", "Value" : { "Fn::Join": [ "-", [ { "Ref": "AWS::StackName"}, "Master" ] ] } }
         ]
@@ -472,45 +434,7 @@
         "AssociatePublicIpAddress" : true,
         "KeyName" : { "Ref" : "KeyName"},
         "SecurityGroups" : [ { "Ref" : "NodeCoreOSSecurityGroup"} ],
-        "UserData" : { "Fn::Base64" :
-        { "Fn::Join" : [ "", [
-          "#cloud-config\n\n",
-          "coreos:\n",
-          "  etcd2:\n",
-          "    discovery: ", { "Ref" : "DiscoveryURL" }, "\n",
-          "    advertise-client-urls: http://$", { "Ref" : "AdvertisedIPAddress" }, "_ipv4:2379\n",
-          "    initial-advertise-peer-urls: http://$", { "Ref" : "AdvertisedIPAddress" }, "_ipv4:2380\n",
-          "    listen-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001\n",
-          "    listen-peer-urls: http://$", { "Ref" : "AdvertisedIPAddress" }, "_ipv4:2380\n",
-          "  units:\n",
-          "    - name: docker-tcp.socket\n",
-          "      command: start\n",
-          "      enable: true\n",
-          "      content: |\n",
-          "        [Unit]\n",
-          "        Description=Docker Socket for the API\n\n",
-          "        [Socket]\n",
-          "        ListenStream=4243\n",
-          "        BindIPv6Only=both\n",
-          "        Service=docker.service\n\n",
-          "        [Install]\n",
-          "        WantedBy=sockets.target\n",
-          "    - name: etcd2.service\n",
-          "      command: start\n",
-          "    - name: fleet.service\n",
-          "      command: start\n",
-          "    - name: docker-swarm.service\n",
-          "      command: start\n",
-          "      content: |\n",
-          "        [Unit]\n",
-          "        Description=Swarm service\n",
-          "        After=docker.service\n\n",
-          "        [Service]\n",
-          "        Restart=no\n",
-          "        ExecStart=/usr/bin/docker run --name docker-swarm -d swarm join --addr=$", { "Ref" : "AdvertisedIPAddress" }, "_ipv4:4243 etcd://", { "Fn::GetAtt" : [ "MasterCoreOSInstance", "PrivateIp" ] }, ":2379/swarm\n"
-          ] ]
-        }
-      }
+        "UserData" : { "Fn::Base64" : { "Ref" : "UserDataMinion" } }
       }
     },
 

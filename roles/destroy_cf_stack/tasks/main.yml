@@ -5,4 +5,4 @@
     stack_name: "{{ cf_stack_name }}"
     aws_access_key: "{{ aws_access_key }}"
     aws_secret_key: "{{ aws_secret_key }}"
-    template: "roles/create_cf_stack/files/coreos-beta-hvm.template"
+    template: "roles/create_cf_stack/files/coreos-beta-swarm-hvm.template"

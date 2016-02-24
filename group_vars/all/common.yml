@@ -4,4 +4,4 @@ cf_region: us-west-2
 cf_cluster_size: 3
 cf_vpc_azs: "{{ cf_region }}a,{{ cf_region }}b,{{ cf_region }}c"
 
-advertised_ip_address: public
+advertised_ip_address: private

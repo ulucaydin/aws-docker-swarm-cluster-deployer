@@ -28,8 +28,9 @@
       InstanceType: "{{ cf_instance_type }}"
       ClusterSize: "{{ cf_cluster_size }}"
       KeyName: "{{ aws_keypair }}"
-      UserDataMinion: "{{ minion_cloud_config | b64encode }}"
-      UserDataMaster: "{{ master_cloud_config | b64encode }}"
+      AdvertisedIPAddress: "{{ advertised_ip_address }}"
+      UserDataMinion: "{{ minion_cloud_config }}"
+      UserDataMaster: "{{ master_cloud_config }}"
       DiscoveryURL: "{{ discovery_service_url.content }}"
       VpcAvailabilityZones: "{{ cf_vpc_azs }}"
     tags:
