@@ -2,19 +2,19 @@
 
 - name: Get a new Discovery Service url
   uri:
-    url: "https://discovery.etcd.io/new?size={{ cf_cluster_size }}"
+    url: "https://discovery.etcd.io/new?size={{ cf_master_cluster_size }}"
     return_content: yes
   register: discovery_service_url
 
 - set_fact:
-    master_cloud_config: "{{ lookup('template', '../templates/master-config-file.yml.j2') }}"
-    minion_cloud_config: "{{ lookup('template', '../templates/minion-config-file.yml.j2') }}"
+    master_cloud_config: "{{ lookup('template', '../templates/master-config-file.yml.j2') | replace('\r\n', '\\n') }}"
+    minion_cloud_config: "{{ lookup('template', '../templates/minion-config-file.yml.j2') | replace('\r\n', '\\n') }}"
 
-- name: Print master config file
-  debug: msg="{{ master_cloud_config }}"
+- set_fact:
+    cf_template: "{{ lookup('template', 'coreos-beta-swarm-hvm.template') }}"
 
-- name: Print minion config file
-  debug: msg="{{ minion_cloud_config }}"
+- name: Save the generated CF template file
+  local_action: copy content="{{ cf_template }}" dest=./cf_template
 
 - name: Create a new Stack using the given params and template
   cloudformation:
@@ -22,15 +22,13 @@
     stack_name: "{{ cf_stack_name }}"
     aws_access_key: "{{ aws_access_key }}"
     aws_secret_key: "{{ aws_secret_key }}"
-    template: "roles/create_cf_stack/files/coreos-beta-swarm-hvm.template"
+    template: "cf_template"
     region: "{{ cf_region }}"
     template_parameters:
       InstanceType: "{{ cf_instance_type }}"
-      ClusterSize: "{{ cf_cluster_size }}"
+      NodeClusterSize: "{{ cf_node_cluster_size }}"
+      MasterClusterSize: "{{ cf_master_cluster_size }}"
       KeyName: "{{ aws_keypair }}"
-      AdvertisedIPAddress: "{{ advertised_ip_address }}"
-      UserDataMinion: "{{ minion_cloud_config }}"
-      UserDataMaster: "{{ master_cloud_config }}"
       DiscoveryURL: "{{ discovery_service_url.content }}"
       VpcAvailabilityZones: "{{ cf_vpc_azs }}"
     tags:

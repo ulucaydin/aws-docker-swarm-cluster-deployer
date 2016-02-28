@@ -8,10 +8,6 @@ coreos:
     listen-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
     listen-peer-urls: http://${{ advertised_ip_address }}_ipv4:2380
   units:
-    - name: etcd2.service
-      command: start
-    - name: fleet.service
-      command: start
     - name: docker-tcp.socket
       command: start
       enable: true
@@ -26,3 +22,4 @@ coreos:
 
         [Install]
         WantedBy=sockets.target
+        
