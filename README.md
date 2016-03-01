@@ -1,8 +1,12 @@
 # Ansible & Cloud Formation automation for creating Highly-Available Docker Swarm clusters on AWS
 
-Scalable Docker Swarm cluster deployment using the combination of AWS CloudFormation to create resources (such as EC2, VPC, AutoScaling etc..) and Ansible to automate the process with a single command. Deployment EC2 instances use CoreOS as it's ideal for this scenario. 
+Scalable Docker Swarm cluster deployment using the combination of AWS CloudFormation to create resources (such as EC2, VPC, AutoScaling etc..) and Ansible to automate the process with a single command. Deployment EC2 instances use CoreOS as it's ideal for this scenario.
 
 If a Stack already exist with the given stack name, it will update. Otherwise creates a new stack from scratch.
+
+#### Topology of Deployment
+
+![Topology](topology.png "Topology")
 
 #### Quickstart Guide:
 
