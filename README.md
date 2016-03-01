@@ -8,6 +8,17 @@ If a Stack already exist with the given stack name, it will update. Otherwise cr
 
 ![Topology](topology.png "Topology")
 
+### Highlights
+
+- CoreOS as the host OS for all instances.
+- Self provisioning of instances using cloud-config of CoreOS  
+- Two launch configurations, auto scaling groups and elastic load balancers are created: Masters and Minions
+- Minions auto scaling group depends on the creation of the Master auto scaling group to prevent race condition.
+- Etcd enabled for Masters and disabled for minions.
+- Etcds run on master nodes which automatically create a ring cluster by using the discovery url, hence highly-available.
+- Docker Swarm managers on master nodes join the Swarm cluster by using their local Etcd configuration.
+- Docker Swarm minions join the cluster using Master ELB DNS to ensure high-availability.
+
 #### Quickstart Guide:
 
 1. Install Docker and Ansible on your local and clone this repo.
