@@ -29,7 +29,7 @@ If a Stack already exist with the given stack name, it will update. Otherwise cr
 
 4. Make sure to create a keypair in AWS IAM.
 
-5. Crete the CloudFront Stack using Ansible
+5. Create the CloudFront Stack using Ansible
 ``` shell
 ansible-playbook aws_create_swarm_cluster.yml  --extra-vars "cf_stack_name=<clusters name>"
 ```
