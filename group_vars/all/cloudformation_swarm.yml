@@ -1,8 +1,9 @@
 ---
-cf_instance_type: t2.nano
-cf_region: us-west-2
+cf_instance_type: t2.medium
+cf_region: us-east-1
 cf_node_cluster_size: 3
 cf_master_cluster_size: 3
-cf_vpc_azs: "{{ cf_region }}a,{{ cf_region }}b,{{ cf_region }}c"
+cf_vpc_azs: "{{ cf_region }}a,{{ cf_region }}c,{{ cf_region }}d"
+ip_address: "97.107.48.95/32"
 
 advertised_ip_address: private

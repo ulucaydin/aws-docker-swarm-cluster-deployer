@@ -31,6 +31,7 @@
       KeyName: "{{ aws_keypair }}"
       DiscoveryURL: "{{ discovery_service_url.content }}"
       VpcAvailabilityZones: "{{ cf_vpc_azs }}"
+      AllowSSHFrom: "{{ ip_address }}"
     tags:
       Stack: "ansible-cloudformation"
   register: stack_creation_response

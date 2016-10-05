@@ -226,7 +226,7 @@
           "IpProtocol" : "tcp",
           "FromPort" : "4000",
           "ToPort" : "4000",
-          "CidrIp" : "0.0.0.0/0"
+          "CidrIp" : { "Ref" : "AllowSSHFrom" }
         },
         {
           "IpProtocol" : "tcp",
