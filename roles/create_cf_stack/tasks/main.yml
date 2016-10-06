@@ -9,6 +9,7 @@
 - set_fact:
     master_cloud_config: "{{ lookup('template', '../templates/master-config-file.yml.j2') | replace('\r\n', '\\n') }}"
     minion_cloud_config: "{{ lookup('template', '../templates/minion-config-file.yml.j2') | replace('\r\n', '\\n') }}"
+    storage_cloud_config: "{{ lookup('template', '../templates/storage-config-file.yml.j2') | replace('\r\n', '\\n') }}"
 
 - set_fact:
     cf_template: "{{ lookup('template', 'coreos-beta-swarm-hvm.template') }}"

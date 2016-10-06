@@ -1,0 +1,31 @@
+{% include 'cloud-init-common.yml.j2' %}
+
+    - name: docker-swarm.service
+      command: start
+      content: |
+        [Unit]
+        Description=Swarm service
+        After=docker.service
+
+        [Service]
+        Restart=no
+        ExecStart=/usr/bin/docker run --name docker-swarm -d swarm join --addr=${{ advertised_ip_address }}_ipv4:4243 etcd://", { "Fn::GetAtt" : [ "MasterLoadBalancer", "DNSName" ] }, ":2379/swarm
+
+    - name: rpc-statd.service
+      command: start
+      enable: true
+
+    - name: opt-mashape.mount
+      content: |
+        [Mount]
+        What=AZ_ZONE.",{ "Ref": "DataStorageFileSystem" },".efs.",{ "Ref": "AWS::Region" },".amazonaws.com:/
+        Where=/opt/mashape
+
+    - name: runcmd.service
+      command: start
+      content: |
+        [Unit]
+        Description=command
+        [Service]
+        Type=oneshot
+        ExecStart=/bin/sh -c 'export AZ_ZONE=$(curl -L http://169.254.169.254/latest/meta-data/placement/availability-zone) && sed -i \"s/AZ_ZONE/$AZ_ZONE/\" /etc/systemd/system/opt-mashape.mount && systemctl daemon-reload && systemctl restart opt-mashape.mount'

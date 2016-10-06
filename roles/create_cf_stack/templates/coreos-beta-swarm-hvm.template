@@ -15,7 +15,7 @@
           "us-east-1" : { "AMI" : "ami-a4eeacce"},
           "us-west-2" : { "AMI" : "ami-1dddcf7c" },
           "us-west-1" : { "AMI" : "ami-2d2c444d"}
-      }
+      },
   },
 
   "Parameters" : {
@@ -69,7 +69,15 @@
       "Type" : "CommaDelimitedList",
       "Description" : "Comma-delimited list of three VPC availability zones in which nodes are created.",
       "Default" : ""
+    },
+
+    "MountPoint" : {
+      "Description" : "The Linux mount point for the EFS volume",
+      "Type": "String",
+      "MinLength": "1",
+      "Default": "/opt/mashape"
     }
+
   },
 
   "Resources" : {
@@ -216,7 +224,6 @@
       }
     },
 
-
     "MasterLoadBalancerSecurityGroup" : {
       "Type" : "AWS::EC2::SecurityGroup",
       "Properties" : {
@@ -262,6 +269,7 @@
       ]
       }
     },
+
     "NodeLoadBalancerSecurityGroup" : {
       "Type" : "AWS::EC2::SecurityGroup",
       "Properties" : {
@@ -293,9 +301,6 @@
         } ]
       }
     },
-
-
-
 
     "NodeLoadBalancer" : {
       "Type" : "AWS::ElasticLoadBalancing::LoadBalancer",
@@ -348,8 +353,6 @@
         }
       }
     },
-
-
 
     "NodeIngress4243" : {
       "DependsOn" : "NodeSecurityGroup",
@@ -488,8 +491,6 @@
       }
     },
 
-
-
     "MasterAutoScalingGroup" : {
       "Type" : "AWS::AutoScaling::AutoScalingGroup",
       "Properties" : {
@@ -522,7 +523,91 @@
           { "Key" : "Name", "Value" : { "Fn::Join": [ "-", [ { "Ref": "AWS::StackName"}, "Node" ] ] }, "PropagateAtLaunch" : "true" }
         ]
       }
-    }
+    },
+
+    "DataStorageFileSystem": {
+      "Type": "AWS::EFS::FileSystem",
+      "Properties": {
+        "PerformanceMode": "generalPurpose",
+        "FileSystemTags": [
+          {
+            "Key": "Name",
+            "Value": "SwarmDataStorage"
+          }
+        ]
+      }
+    },
+
+    "EfsSecurityGroup" : {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "GroupDescription" : "EFS SecurityGroup",
+        "VpcId" : { "Ref" : "Vpc" },
+        "SecurityGroupIngress" : [
+          { "IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : { "Ref" : "AllowSSHFrom" } },
+          { "IpProtocol" : "tcp", "FromPort" : "2049", "ToPort" : "2049", "CidrIp" : "0.0.0.0/0" }
+        ],
+        "Tags": [
+          { "Key" : "Name", "Value" : { "Fn::Join": [ "-", [ { "Ref": "AWS::StackName"}, "Storage-SG" ] ] } }
+        ]
+      }
+    },
+
+    "Az1MountTarget": {
+      "Type": "AWS::EFS::MountTarget",
+      "Properties": {
+        "FileSystemId": { "Ref": "DataStorageFileSystem" },
+        "SubnetId": { "Ref": "PubSubnetAz1" },
+        "SecurityGroups": [ { "Ref": "EfsSecurityGroup" } ]
+      }
+    },
+
+    "Az2MountTarget": {
+      "Type": "AWS::EFS::MountTarget",
+      "Properties": {
+        "FileSystemId": { "Ref": "DataStorageFileSystem" },
+        "SubnetId": { "Ref": "PubSubnetAz2" },
+        "SecurityGroups": [ { "Ref": "EfsSecurityGroup" } ]
+      }
+    },
+
+    "Az3MountTarget": {
+      "Type": "AWS::EFS::MountTarget",
+      "Properties": {
+        "FileSystemId": { "Ref": "DataStorageFileSystem" },
+        "SubnetId": { "Ref": "PubSubnetAz3" },
+        "SecurityGroups": [ { "Ref": "EfsSecurityGroup" } ]
+      }
+    },
+
+    "StorageNodeLaunchConfiguration": {
+      "DependsOn" : [ "InternetGateway", "MasterAutoScalingGroup", "Az1MountTarget", "Az2MountTarget", "Az3MountTarget" ],
+      "Type": "AWS::AutoScaling::LaunchConfiguration",
+      "Properties": {
+        "AssociatePublicIpAddress" : true,
+        "ImageId" : { "Fn::FindInMap" : [ "RegionMap", { "Ref" : "AWS::Region" }, "AMI" ] },
+        "InstanceType": { "Ref": "InstanceType" },
+        "KeyName": { "Ref": "KeyName" },
+        "SecurityGroups": [ { "Ref": "EfsSecurityGroup" }, { "Ref": "NodeSecurityGroup"} ],
+        "UserData" :  { "Fn::Base64" : {"Fn::Join" : [ "", ["{{ storage_cloud_config }}"] ]} }
+      }
+    },
+
+    "StorageNodeAutoScalingGroup" : {
+      "Type" : "AWS::AutoScaling::AutoScalingGroup",
+      "Properties" : {
+        "AvailabilityZones" :
+          [ { "Fn::Select" : [ "0", { "Ref" : "VpcAvailabilityZones" } ] }, { "Fn::Select" : [ "1", { "Ref" : "VpcAvailabilityZones" } ] }, { "Fn::Select" : [ "2", { "Ref" : "VpcAvailabilityZones" } ] } ],
+        "VPCZoneIdentifier" : [ { "Fn::Join" : [",", [ { "Ref" : "PubSubnetAz1" }, { "Ref" : "PubSubnetAz2" }, { "Ref" : "PubSubnetAz3" } ] ] } ],
+        "LaunchConfigurationName" : { "Ref" : "StorageNodeLaunchConfiguration" },
+        "MinSize" : "1",
+        "MaxSize" : "3",
+        "DesiredCapacity" : "3",
+        "Tags": [
+          { "Key" : "Name", "Value" : { "Fn::Join": [ "-", [ { "Ref": "AWS::StackName"}, "Storage" ] ] }, "PropagateAtLaunch" : "true" }
+        ]
+      }
+    },
 
   },
 
