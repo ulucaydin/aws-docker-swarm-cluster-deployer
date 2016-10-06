@@ -2,10 +2,10 @@
 
     - name: docker.service
       drop-ins:
-        - name: 10-storage_label.conf
+        - name: 10-docker_opts.conf
           content: |
             [Service]
-            Environment=DOCKER_OPTS=--label=storage=true
+            Environment=\"DOCKER_OPTS=--label=storage=true --cluster-store=etcd://", { "Fn::GetAtt" : [ "MasterLoadBalancer", "DNSName" ] }, ":2379  --cluster-advertise=eth0:4243\"
 
     - name: docker-swarm.service
       command: start

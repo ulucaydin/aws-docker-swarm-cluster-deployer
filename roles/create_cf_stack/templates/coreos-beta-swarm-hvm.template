@@ -12,9 +12,9 @@
       },
 
       "RegionMap" : {
-          "us-east-1" : { "AMI" : "ami-a4eeacce"},
-          "us-west-2" : { "AMI" : "ami-1dddcf7c" },
-          "us-west-1" : { "AMI" : "ami-2d2c444d"}
+          "us-east-1" : { "AMI" : "ami-8a15599d"},
+          "us-west-2" : { "AMI" : "ami-a49d45c4" },
+          "us-west-1" : { "AMI" : "ami-217d3441"}
       },
   },
 
