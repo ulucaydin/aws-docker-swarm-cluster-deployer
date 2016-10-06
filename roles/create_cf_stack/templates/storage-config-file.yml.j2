@@ -1,5 +1,12 @@
 {% include 'cloud-init-common.yml.j2' %}
 
+    - name: docker.service
+      drop-ins:
+        - name: 10-storage_label.conf
+          content: |
+            [Service]
+            Environment=DOCKER_OPTS=--label=storage=true
+
     - name: docker-swarm.service
       command: start
       content: |
