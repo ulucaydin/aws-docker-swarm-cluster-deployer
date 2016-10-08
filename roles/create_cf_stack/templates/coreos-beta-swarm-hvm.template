@@ -194,14 +194,7 @@
         "SecurityGroupIngress" : [
           { "IpProtocol" : "tcp", "FromPort" : "0", "ToPort" : "65535", "CidrIp": "10.203.0.0/16" },
           { "IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : { "Ref" : "AllowSSHFrom" } },
-          { "IpProtocol" : "tcp", "FromPort" : "4243", "ToPort" : "4243", "CidrIp" : "0.0.0.0/0" },
-          { "IpProtocol" : "tcp", "FromPort" : "2375", "ToPort" : "2375", "CidrIp" : { "Ref" : "AllowSSHFrom" } },
-          { "IpProtocol" : "tcp", "FromPort" : "80", "ToPort" : "80", "CidrIp" : "0.0.0.0/0" },
-          { "IpProtocol" : "tcp", "FromPort" : "443", "ToPort" : "443", "CidrIp" : "0.0.0.0/0" },
           { "IpProtocol" : "tcp", "FromPort" : "4000", "ToPort" : "4000", "CidrIp" : "0.0.0.0/0" },
-          { "IpProtocol" : "tcp", "FromPort" : "4001", "ToPort" : "4001", "CidrIp" : "0.0.0.0/0" },
-          { "IpProtocol" : "tcp", "FromPort" : "2379", "ToPort" : "2379", "CidrIp" : "0.0.0.0/0" },
-          { "IpProtocol" : "tcp", "FromPort" : "2380", "ToPort" : "2380", "CidrIp" : "0.0.0.0/0" }
         ],
         "Tags": [
           { "Key" : "Name", "Value" : { "Fn::Join": [ "-", [ { "Ref": "AWS::StackName"}, "Master-SG" ] ] } }
@@ -215,9 +208,9 @@
         "GroupDescription" : "Node CoreOS SecurityGroup",
         "VpcId" : { "Ref" : "Vpc" },
         "SecurityGroupIngress" : [
-          { "IpProtocol" : "tcp", "FromPort" : "0", "ToPort" : "65535", "CidrIp": "10.203.0.0/16" },
           { "IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : { "Ref" : "AllowSSHFrom" } },
-          { "IpProtocol" : "tcp", "FromPort" : "80", "ToPort" : "80", "CidrIp" : "0.0.0.0/0" }
+          { "IpProtocol" : "tcp", "FromPort" : "0", "ToPort" : "65535", "CidrIp" : "10.203.0.0/16" },
+          { "IpProtocol" : "udp", "FromPort" : "0", "ToPort" : "65535", "CidrIp" : "10.203.0.0/16" }
         ],
         "Tags": [
           { "Key" : "Name", "Value" : { "Fn::Join": [ "-", [ { "Ref": "AWS::StackName"}, "Node-SG" ] ] } }
@@ -247,12 +240,6 @@
           "IpProtocol" : "tcp",
           "FromPort" : "2379",
           "ToPort" : "2379",
-          "CidrIp" : "0.0.0.0/0"
-        },
-        {
-          "IpProtocol" : "tcp",
-          "FromPort" : "2375",
-          "ToPort" : "2375",
           "CidrIp" : "0.0.0.0/0"
         }
       ],
@@ -297,12 +284,6 @@
         },
         {
           "IpProtocol" : "tcp",
-          "FromPort" : "0",
-          "ToPort" : "65535",
-          "CidrIp": "10.203.0.0/16"
-        },
-        {
-          "IpProtocol" : "tcp",
           "FromPort" : "443",
           "ToPort" : "443",
           "CidrIp" : "0.0.0.0/0"
@@ -311,18 +292,6 @@
           "IpProtocol" : "tcp",
           "FromPort" : "80",
           "ToPort" : "80",
-          "CidrIp" : "0.0.0.0/0"
-        },
-        {
-          "IpProtocol" : "tcp",
-          "FromPort" : "0",
-          "ToPort" : "65535",
-          "CidrIp": "10.203.0.0/16"
-        },
-        {
-          "IpProtocol" : "tcp",
-          "FromPort" : "8080",
-          "ToPort" : "8080",
           "CidrIp" : "0.0.0.0/0"
         } ]
       }
@@ -377,118 +346,6 @@
           "Interval" : "30",
           "Timeout" : "5"
         }
-      }
-    },
-
-    "NodeIngress4243" : {
-      "DependsOn" : "NodeSecurityGroup",
-      "Type" : "AWS::EC2::SecurityGroupIngress",
-      "Properties" : {
-        "GroupId" : {
-          "Fn::GetAtt" : [ "NodeSecurityGroup", "GroupId" ]
-        },
-        "IpProtocol" : "tcp",
-        "FromPort" : "4243",
-        "ToPort" : "4243",
-        "CidrIp" : "0.0.0.0/0"
-      }
-    },
-
-    "NodeIngress4001" : {
-      "DependsOn" : "NodeSecurityGroup",
-      "Type" : "AWS::EC2::SecurityGroupIngress",
-      "Properties" : {
-        "GroupId" : {
-          "Fn::GetAtt" : [ "NodeSecurityGroup", "GroupId" ]
-        },
-        "IpProtocol" : "tcp",
-        "FromPort" : "4001",
-        "ToPort" : "4001",
-        "CidrIp" : "0.0.0.0/0"
-      }
-    },
-
-    "NodeIngress2379" : {
-      "DependsOn" : "NodeSecurityGroup",
-      "Type" : "AWS::EC2::SecurityGroupIngress",
-      "Properties" : {
-        "GroupId" : {
-          "Fn::GetAtt" : [ "NodeSecurityGroup", "GroupId" ]
-        },
-        "IpProtocol" : "tcp",
-        "FromPort" : "2379",
-        "ToPort" : "2379",
-        "CidrIp" : "0.0.0.0/0"
-      }
-    },
-
-    "NodeIngress2380" : {
-      "DependsOn" : "NodeSecurityGroup",
-      "Type" : "AWS::EC2::SecurityGroupIngress",
-      "Properties" : {
-        "GroupId" : {
-          "Fn::GetAtt" : [ "NodeSecurityGroup", "GroupId" ]
-        },
-        "IpProtocol" : "tcp",
-        "FromPort" : "2380",
-        "ToPort" : "2380",
-        "CidrIp" : "0.0.0.0/0"
-      }
-    },
-
-    "MasterIngress4243" : {
-      "DependsOn" : [ "MasterSecurityGroup", "NodeSecurityGroup" ],
-      "Type" : "AWS::EC2::SecurityGroupIngress",
-      "Properties" : {
-        "GroupId" : {
-          "Fn::GetAtt" : [ "NodeSecurityGroup", "GroupId" ]
-        },
-        "IpProtocol" : "tcp",
-        "FromPort" : "4243",
-        "ToPort" : "4243",
-        "CidrIp" : "0.0.0.0/0"
-      }
-    },
-
-    "MasterIngress4001" : {
-      "DependsOn" : [ "MasterSecurityGroup", "NodeSecurityGroup" ],
-      "Type" : "AWS::EC2::SecurityGroupIngress",
-      "Properties" : {
-        "GroupId" : {
-          "Fn::GetAtt" : [ "NodeSecurityGroup", "GroupId" ]
-        },
-        "IpProtocol" : "tcp",
-        "FromPort" : "4001",
-        "ToPort" : "4001",
-        "CidrIp" : "0.0.0.0/0"
-      }
-    },
-
-    "MasterIngress2379" : {
-      "DependsOn" : [ "MasterSecurityGroup", "NodeSecurityGroup" ],
-      "Type" : "AWS::EC2::SecurityGroupIngress",
-      "Properties" : {
-        "GroupId" : {
-          "Fn::GetAtt" : [ "NodeSecurityGroup", "GroupId" ]
-        },
-        "IpProtocol" : "tcp",
-        "FromPort" : "2379",
-        "ToPort" : "2379",
-        "CidrIp" : "0.0.0.0/0"
-      }
-    },
-
-    "MasterIngress2380" : {
-      "DependsOn" : [ "MasterSecurityGroup", "NodeSecurityGroup" ],
-      "Type" : "AWS::EC2::SecurityGroupIngress",
-      "Properties" : {
-        "GroupId" : {
-          "Fn::GetAtt" : [ "NodeSecurityGroup", "GroupId" ]
-        },
-        "IpProtocol" : "tcp",
-        "FromPort" : "2380",
-        "ToPort" : "2380",
-        "CidrIp" : "0.0.0.0/0"
       }
     },
 
@@ -570,9 +427,7 @@
         "GroupDescription" : "EFS SecurityGroup",
         "VpcId" : { "Ref" : "Vpc" },
         "SecurityGroupIngress" : [
-          { "IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : { "Ref" : "AllowSSHFrom" } },
-          { "IpProtocol" : "tcp", "FromPort" : "2049", "ToPort" : "2049", "CidrIp" : "0.0.0.0/0" },
-          { "IpProtocol" : "tcp", "FromPort" : "0", "ToPort" : "65535", "CidrIp": "10.203.0.0/16" }
+          { "IpProtocol" : "tcp", "FromPort" : "2049", "ToPort" : "2049", "CidrIp" : "10.203.0.0/16" }
         ],
         "Tags": [
           { "Key" : "Name", "Value" : { "Fn::Join": [ "-", [ { "Ref": "AWS::StackName"}, "Storage-SG" ] ] } }
