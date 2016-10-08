@@ -474,6 +474,22 @@
         "UserData" :  { "Fn::Base64" : {"Fn::Join" : [ "", ["{{ storage_cloud_config }}"] ]} }
       }
     },
+
+    "StorageNodeAutoScalingGroup" : {
+      "Type" : "AWS::AutoScaling::AutoScalingGroup",
+      "Properties" : {
+        "AvailabilityZones" :
+          [ { "Fn::Select" : [ "0", { "Ref" : "VpcAvailabilityZones" } ] }, { "Fn::Select" : [ "1", { "Ref" : "VpcAvailabilityZones" } ] }, { "Fn::Select" : [ "2", { "Ref" : "VpcAvailabilityZones" } ] } ],
+        "VPCZoneIdentifier" : [ { "Fn::Join" : [",", [ { "Ref" : "PubSubnetAz1" }, { "Ref" : "PubSubnetAz2" }, { "Ref" : "PubSubnetAz3" } ] ] } ],
+        "LaunchConfigurationName" : { "Ref" : "StorageNodeLaunchConfiguration" },
+        "MinSize" : "1",
+        "MaxSize" : "3",
+        "DesiredCapacity" : "3",
+        "Tags": [
+          { "Key" : "Name", "Value" : { "Fn::Join": [ "-", [ { "Ref": "AWS::StackName"}, "Storage" ] ] }, "PropagateAtLaunch" : "true" }
+        ]
+      }
+    },
   },
 
 

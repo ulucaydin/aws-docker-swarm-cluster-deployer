@@ -1,22 +1,4 @@
-{% include 'cloud-init-common.yml.j2' %}
-
-    - name: docker.service
-      drop-ins:
-        - name: 10-docker_opts.conf
-          content: |
-            [Service]
-            Environment=\"DOCKER_OPTS=--label=storage=true --cluster-store=etcd://", { "Fn::GetAtt" : [ "MasterLoadBalancer", "DNSName" ] }, ":2379  --cluster-advertise=eth0:4243\"
-
-    - name: docker-swarm.service
-      command: start
-      content: |
-        [Unit]
-        Description=Swarm service
-        After=docker.service
-
-        [Service]
-        Restart=no
-        ExecStart=/usr/bin/docker run --name docker-swarm -d swarm join --addr=${{ advertised_ip_address }}_ipv4:4243 etcd://", { "Fn::GetAtt" : [ "MasterLoadBalancer", "DNSName" ] }, ":2379/swarm
+{% include 'minion-config-file.yml.j2' %}
 
     - name: rpc-statd.service
       command: start
