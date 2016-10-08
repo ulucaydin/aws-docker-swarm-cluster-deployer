@@ -4,6 +4,12 @@
       command: start
     - name: fleet.service
       command: start
+    - name: docker.service
+      drop-ins:
+        - name: 10-docker_opts.conf
+          content: |
+            [Service]
+            Environment=\"DOCKER_OPTS=--cluster-store=etcd://localhost:2379 --cluster-advertise=eth0:4243\"
     - name: docker-swarm.service
       command: start
       content: |
@@ -13,4 +19,4 @@
 
         [Service]
         Restart=no
-        ExecStart=/usr/bin/docker run -p 4000:4000 -d swarm manage -H :4000 --replication --advertise $public_ipv4:4000 etcd://$public_ipv4:2379/swarm
+        ExecStart=/usr/bin/docker run -p 4000:4000 -d swarm manage -H :4000 --replication --advertise $public_ipv4:4000 etcd://$private_ipv4:2379/swarm

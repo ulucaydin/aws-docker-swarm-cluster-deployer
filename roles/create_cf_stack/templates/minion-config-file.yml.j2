@@ -1,5 +1,12 @@
 {% include 'cloud-init-common.yml.j2' %}
 
+    - name: docker.service
+      drop-ins:
+        - name: 10-docker_opts.conf
+          content: |
+            [Service]
+            Environment=\"DOCKER_OPTS=--cluster-store=etcd://", { "Fn::GetAtt" : [ "MasterLoadBalancer", "DNSName" ] }, ":2379 --cluster-advertise=eth0:4243\"
+
     - name: docker-swarm.service
       command: start
       content: |

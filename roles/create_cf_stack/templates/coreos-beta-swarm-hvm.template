@@ -12,8 +12,8 @@
       },
 
       "RegionMap" : {
-          "us-east-1" : { "AMI" : "ami-8a15599d"},
-          "us-west-2" : { "AMI" : "ami-a49d45c4" },
+          "us-east-1" : { "AMI" : "ami-e61d52f1"},
+          "us-west-2" : { "AMI" : "ami-b0c21ad0" },
           "us-west-1" : { "AMI" : "ami-217d3441"}
       },
   },
@@ -192,8 +192,9 @@
         "GroupDescription" : "Master CoreOS SecurityGroup",
         "VpcId" : { "Ref" : "Vpc" },
         "SecurityGroupIngress" : [
+          { "IpProtocol" : "tcp", "FromPort" : "0", "ToPort" : "65535", "CidrIp": "10.203.0.0/16" },
           { "IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : { "Ref" : "AllowSSHFrom" } },
-          { "IpProtocol" : "tcp", "FromPort" : "4243", "ToPort" : "4243", "CidrIp" : { "Ref" : "AllowSSHFrom" } },
+          { "IpProtocol" : "tcp", "FromPort" : "4243", "ToPort" : "4243", "CidrIp" : "0.0.0.0/0" },
           { "IpProtocol" : "tcp", "FromPort" : "2375", "ToPort" : "2375", "CidrIp" : { "Ref" : "AllowSSHFrom" } },
           { "IpProtocol" : "tcp", "FromPort" : "80", "ToPort" : "80", "CidrIp" : "0.0.0.0/0" },
           { "IpProtocol" : "tcp", "FromPort" : "443", "ToPort" : "443", "CidrIp" : "0.0.0.0/0" },
@@ -214,6 +215,7 @@
         "GroupDescription" : "Node CoreOS SecurityGroup",
         "VpcId" : { "Ref" : "Vpc" },
         "SecurityGroupIngress" : [
+          { "IpProtocol" : "tcp", "FromPort" : "0", "ToPort" : "65535", "CidrIp": "10.203.0.0/16" },
           { "IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : { "Ref" : "AllowSSHFrom" } },
           { "IpProtocol" : "tcp", "FromPort" : "80", "ToPort" : "80", "CidrIp" : "0.0.0.0/0" }
         ],
@@ -228,7 +230,14 @@
       "Properties" : {
         "GroupDescription" : "Enable communication with Swarm Masters and Etcd",
         "VpcId" : { "Ref" : "Vpc" },
-        "SecurityGroupIngress" : [ {
+        "SecurityGroupIngress" : [
+        {
+          "IpProtocol" : "tcp",
+          "FromPort" : "0",
+          "ToPort" : "65535",
+          "CidrIp": "10.203.0.0/16"
+        },
+        {
           "IpProtocol" : "tcp",
           "FromPort" : "4000",
           "ToPort" : "4000",
@@ -252,6 +261,12 @@
           "FromPort" : "4000",
           "ToPort" : "4000",
           "CidrIp" : "0.0.0.0/0"
+        },
+        {
+          "IpProtocol" : "tcp",
+          "FromPort" : "0",
+          "ToPort" : "65535",
+          "CidrIp": "10.203.0.0/16"
         },
         {
           "IpProtocol" : "tcp",
@@ -282,6 +297,12 @@
         },
         {
           "IpProtocol" : "tcp",
+          "FromPort" : "0",
+          "ToPort" : "65535",
+          "CidrIp": "10.203.0.0/16"
+        },
+        {
+          "IpProtocol" : "tcp",
           "FromPort" : "443",
           "ToPort" : "443",
           "CidrIp" : "0.0.0.0/0"
@@ -291,6 +312,12 @@
           "FromPort" : "80",
           "ToPort" : "80",
           "CidrIp" : "0.0.0.0/0"
+        },
+        {
+          "IpProtocol" : "tcp",
+          "FromPort" : "0",
+          "ToPort" : "65535",
+          "CidrIp": "10.203.0.0/16"
         },
         {
           "IpProtocol" : "tcp",
@@ -544,7 +571,8 @@
         "VpcId" : { "Ref" : "Vpc" },
         "SecurityGroupIngress" : [
           { "IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : { "Ref" : "AllowSSHFrom" } },
-          { "IpProtocol" : "tcp", "FromPort" : "2049", "ToPort" : "2049", "CidrIp" : "0.0.0.0/0" }
+          { "IpProtocol" : "tcp", "FromPort" : "2049", "ToPort" : "2049", "CidrIp" : "0.0.0.0/0" },
+          { "IpProtocol" : "tcp", "FromPort" : "0", "ToPort" : "65535", "CidrIp": "10.203.0.0/16" }
         ],
         "Tags": [
           { "Key" : "Name", "Value" : { "Fn::Join": [ "-", [ { "Ref": "AWS::StackName"}, "Storage-SG" ] ] } }
@@ -591,23 +619,6 @@
         "UserData" :  { "Fn::Base64" : {"Fn::Join" : [ "", ["{{ storage_cloud_config }}"] ]} }
       }
     },
-
-    "StorageNodeAutoScalingGroup" : {
-      "Type" : "AWS::AutoScaling::AutoScalingGroup",
-      "Properties" : {
-        "AvailabilityZones" :
-          [ { "Fn::Select" : [ "0", { "Ref" : "VpcAvailabilityZones" } ] }, { "Fn::Select" : [ "1", { "Ref" : "VpcAvailabilityZones" } ] }, { "Fn::Select" : [ "2", { "Ref" : "VpcAvailabilityZones" } ] } ],
-        "VPCZoneIdentifier" : [ { "Fn::Join" : [",", [ { "Ref" : "PubSubnetAz1" }, { "Ref" : "PubSubnetAz2" }, { "Ref" : "PubSubnetAz3" } ] ] } ],
-        "LaunchConfigurationName" : { "Ref" : "StorageNodeLaunchConfiguration" },
-        "MinSize" : "1",
-        "MaxSize" : "3",
-        "DesiredCapacity" : "3",
-        "Tags": [
-          { "Key" : "Name", "Value" : { "Fn::Join": [ "-", [ { "Ref": "AWS::StackName"}, "Storage" ] ] }, "PropagateAtLaunch" : "true" }
-        ]
-      }
-    },
-
   },
 
 
