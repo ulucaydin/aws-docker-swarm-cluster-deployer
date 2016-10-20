@@ -129,77 +129,6 @@
       }
     },
 
-    "PrivateSubnetAz1" : {
-      "Type" : "AWS::EC2::Subnet",
-      "Properties" : {
-        "VpcId" : { "Ref" : "Vpc" },
-        "CidrBlock" : { "Fn::FindInMap" : [ "VpcCidrs", { "Ref" : "AWS::Region" }, "privsubnet1" ] },
-        "AvailabilityZone" : { "Fn::Select" : [ "0", { "Ref" : "VpcAvailabilityZones" } ] },
-        "Tags": [
-          { "Key" : "Name", "Value" : { "Fn::Join": [ "-", [ { "Ref": "AWS::StackName"}, "PrivateSubnet1"] ] } }
-        ]
-      }
-    },
-
-    "PrivateSubnetAz2" : {
-      "Type" : "AWS::EC2::Subnet",
-      "Properties" : {
-        "VpcId" : { "Ref" : "Vpc" },
-        "CidrBlock" : { "Fn::FindInMap" : [ "VpcCidrs", { "Ref" : "AWS::Region" }, "privsubnet2" ] },
-        "AvailabilityZone" : { "Fn::Select" : [ "1", { "Ref" : "VpcAvailabilityZones" } ] },
-        "Tags": [
-          { "Key" : "Name", "Value" : { "Fn::Join": [ "-", [ { "Ref": "AWS::StackName"}, "PrivateSubnet2"] ] } }
-        ]
-      }
-    },
-
-    "PrivateSubnetAz3" : {
-      "Type" : "AWS::EC2::Subnet",
-      "Properties" : {
-        "VpcId" : { "Ref" : "Vpc" },
-        "CidrBlock" : { "Fn::FindInMap" : [ "VpcCidrs", { "Ref" : "AWS::Region" }, "privsubnet3" ] },
-        "AvailabilityZone" : { "Fn::Select" : [ "2", { "Ref" : "VpcAvailabilityZones" } ] },
-        "Tags": [
-          { "Key" : "Name", "Value" : { "Fn::Join": [ "-", [ { "Ref": "AWS::StackName"}, "PrivateSubnet3"] ] } }
-        ]
-      }
-    },
-
-    "RouteViaNAT" : {
-      "DependsOn" : ["Vpc"],
-      "Type" : "AWS::EC2::RouteTable",
-      "Properties" : {
-        "VpcId" : { "Ref" : "Vpc" }
-      }
-    },
-
-    "PrivateSubnetAz1RouteTableAssociation" : {
-      "DependsOn" : ["PrivateSubnetAz1", "PrivateRouteTableAz1"],
-      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
-      "Properties" : {
-        "SubnetId" : { "Ref" : "PrivateSubnetAz1" },
-        "RouteTableId" : { "Ref" : "RouteViaNAT" }
-      }
-    },
-
-    "PrivateSubnetAz2RouteTableAssociation" : {
-      "DependsOn" : ["PrivateSubnetAz2", "PrivateRouteTableAz2"],
-      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
-      "Properties" : {
-        "SubnetId" : { "Ref" : "PrivateSubnetAz2" },
-        "RouteTableId" : { "Ref" : "RouteViaNAT" }
-      }
-    },
-
-    "PrivateSubnetAz3RouteTableAssociation" : {
-      "DependsOn" : ["PrivateSubnetAz3", "PrivateRouteTableAz3"],
-      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
-      "Properties" : {
-        "SubnetId" : { "Ref" : "PrivateSubnetAz3" },
-        "RouteTableId" : { "Ref" : "RouteViaNAT" }
-      }
-    },
-
     "InternetGateway" : {
       "Type" : "AWS::EC2::InternetGateway",
       "Properties" : {
@@ -254,6 +183,123 @@
       "Properties" : {
         "SubnetId" : { "Ref" : "PubSubnetAz3" },
         "RouteTableId" : { "Ref" : "RouteViaIgw" }
+      }
+    },
+
+    "PrivateSubnetAz1" : {
+      "Type" : "AWS::EC2::Subnet",
+      "Properties" : {
+        "VpcId" : { "Ref" : "Vpc" },
+        "CidrBlock" : { "Fn::FindInMap" : [ "VpcCidrs", { "Ref" : "AWS::Region" }, "privsubnet1" ] },
+        "AvailabilityZone" : { "Fn::Select" : [ "0", { "Ref" : "VpcAvailabilityZones" } ] },
+        "Tags": [
+          { "Key" : "Name", "Value" : { "Fn::Join": [ "-", [ { "Ref": "AWS::StackName"}, "PrivateSubnet1"] ] } }
+        ]
+      }
+    },
+
+    "PrivateSubnetAz2" : {
+      "Type" : "AWS::EC2::Subnet",
+      "Properties" : {
+        "VpcId" : { "Ref" : "Vpc" },
+        "CidrBlock" : { "Fn::FindInMap" : [ "VpcCidrs", { "Ref" : "AWS::Region" }, "privsubnet2" ] },
+        "AvailabilityZone" : { "Fn::Select" : [ "1", { "Ref" : "VpcAvailabilityZones" } ] },
+        "Tags": [
+          { "Key" : "Name", "Value" : { "Fn::Join": [ "-", [ { "Ref": "AWS::StackName"}, "PrivateSubnet2"] ] } }
+        ]
+      }
+    },
+
+    "PrivateSubnetAz3" : {
+      "Type" : "AWS::EC2::Subnet",
+      "Properties" : {
+        "VpcId" : { "Ref" : "Vpc" },
+        "CidrBlock" : { "Fn::FindInMap" : [ "VpcCidrs", { "Ref" : "AWS::Region" }, "privsubnet3" ] },
+        "AvailabilityZone" : { "Fn::Select" : [ "2", { "Ref" : "VpcAvailabilityZones" } ] },
+        "Tags": [
+          { "Key" : "Name", "Value" : { "Fn::Join": [ "-", [ { "Ref": "AWS::StackName"}, "PrivateSubnet3"] ] } }
+        ]
+      }
+    },
+
+    "PrivateRouteTableAz1" : {
+      "DependsOn" : ["Vpc"],
+      "Type" : "AWS::EC2::RouteTable",
+      "Properties" : {
+        "VpcId" : { "Ref" : "Vpc" }
+      }
+    },
+
+    "PrivateRouteTableAz2" : {
+      "DependsOn" : ["Vpc"],
+      "Type" : "AWS::EC2::RouteTable",
+      "Properties" : {
+        "VpcId" : { "Ref" : "Vpc" }
+      }
+    },
+
+    "PrivateRouteTableAz3" : {
+      "DependsOn" : ["Vpc"],
+      "Type" : "AWS::EC2::RouteTable",
+      "Properties" : {
+        "VpcId" : { "Ref" : "Vpc" }
+      }
+    },
+
+    "PrivateSubnetAz1RouteTableAssociation" : {
+      "DependsOn" : ["PrivateSubnetAz1", "PrivateRouteTableAz1"],
+      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties" : {
+        "SubnetId" : { "Ref" : "PrivateSubnetAz1" },
+        "RouteTableId" : { "Ref" : "PrivateRouteTableAz1" }
+      }
+    },
+
+    "PrivateSubnetAz2RouteTableAssociation" : {
+      "DependsOn" : ["PrivateSubnetAz2", "PrivateRouteTableAz2"],
+      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties" : {
+        "SubnetId" : { "Ref" : "PrivateSubnetAz2" },
+        "RouteTableId" : { "Ref" : "PrivateRouteTableAz2" }
+      }
+    },
+
+    "PrivateSubnetAz3RouteTableAssociation" : {
+      "DependsOn" : ["PrivateSubnetAz3", "PrivateRouteTableAz3"],
+      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties" : {
+        "SubnetId" : { "Ref" : "PrivateSubnetAz3" },
+        "RouteTableId" : { "Ref" : "PrivateRouteTableAz3" }
+      }
+    },
+
+    "PrivateRouteAz1" : {
+      "DependsOn" : ["PrivateRouteTableAz1", "NAT"],
+      "Type" : "AWS::EC2::Route",
+      "Properties" : {
+        "RouteTableId" : { "Ref" : "PrivateRouteTableAz1" },
+        "DestinationCidrBlock" : "0.0.0.0/0",
+        "InstanceId" : { "Ref" : "NAT" }
+      }
+    },
+
+    "PrivateRouteAz2" : {
+      "DependsOn" : ["PrivateRouteTableAz2", "NAT"],
+      "Type" : "AWS::EC2::Route",
+      "Properties" : {
+        "RouteTableId" : { "Ref" : "PrivateRouteTableAz2" },
+        "DestinationCidrBlock" : "0.0.0.0/0",
+        "InstanceId" : { "Ref" : "NAT" }
+      }
+    },
+
+    "PrivateRouteAz3" : {
+      "DependsOn" : ["PrivateRouteTableAz3", "NAT"],
+      "Type" : "AWS::EC2::Route",
+      "Properties" : {
+        "RouteTableId" : { "Ref" : "PrivateRouteTableAz3" },
+        "DestinationCidrBlock" : "0.0.0.0/0",
+        "InstanceId" : { "Ref" : "NAT" }
       }
     },
 
@@ -332,36 +378,6 @@
           "#!/bin/bash\n",
           "yum update -y && yum install -y yum-cron && chkconfig yum-cron on"
         ]]}}
-      }
-    },
-
-    "PrivateRouteAz1" : {
-      "DependsOn" : ["PrivateRouteTableAz1", "NAT"],
-      "Type" : "AWS::EC2::Route",
-      "Properties" : {
-        "RouteTableId" : { "Ref" : "PrivateRouteTableAz1" },
-        "DestinationCidrBlock" : "0.0.0.0/0",
-        "InstanceId" : { "Ref" : "NAT" }
-      }
-    },
-
-    "PrivateRouteAz2" : {
-      "DependsOn" : ["PrivateRouteTableAz2", "NAT"],
-      "Type" : "AWS::EC2::Route",
-      "Properties" : {
-        "RouteTableId" : { "Ref" : "PrivateRouteTableAz2" },
-        "DestinationCidrBlock" : "0.0.0.0/0",
-        "InstanceId" : { "Ref" : "NAT" }
-      }
-    },
-
-    "PrivateRouteAz3" : {
-      "DependsOn" : ["PrivateRouteTableAz3", "NAT"],
-      "Type" : "AWS::EC2::Route",
-      "Properties" : {
-        "RouteTableId" : { "Ref" : "PrivateRouteTableAz3" },
-        "DestinationCidrBlock" : "0.0.0.0/0",
-        "InstanceId" : { "Ref" : "NAT" }
       }
     },
 
@@ -502,6 +518,7 @@
     "MasterLoadBalancer" : {
       "Type" : "AWS::ElasticLoadBalancing::LoadBalancer",
       "Properties" : {
+        "Scheme": "internal",
         "LoadBalancerName" : {"Fn::Join" : ["-", ["master", { "Ref" : "Vpc" } ]]},
         "CrossZone": true,
         "SecurityGroups" : [ { "Ref" : "MasterLoadBalancerSecurityGroup" } ],
