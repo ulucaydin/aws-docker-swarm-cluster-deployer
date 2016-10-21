@@ -558,7 +558,7 @@
     },
 
     "NodeLaunchConfiguration" : {
-      "DependsOn" : [ "InternetGateway", "MasterAutoScalingGroup" ],
+      "DependsOn" : [ "InternetGateway", "MasterAutoScalingGroup", "NAT" ],
       "Type" : "AWS::AutoScaling::LaunchConfiguration",
       "Properties" : {
         "ImageId" : { "Fn::FindInMap" : [ "RegionMap", { "Ref" : "AWS::Region" }, "AMI" ] },
@@ -659,7 +659,7 @@
     },
 
     "StorageNodeLaunchConfiguration": {
-      "DependsOn" : [ "InternetGateway", "MasterAutoScalingGroup", "Az1MountTarget", "Az2MountTarget", "Az3MountTarget" ],
+      "DependsOn" : [ "MasterAutoScalingGroup", "Az1MountTarget", "Az2MountTarget", "Az3MountTarget", "NAT" ],
       "Type": "AWS::AutoScaling::LaunchConfiguration",
       "Properties": {
         "AssociatePublicIpAddress" : false,
