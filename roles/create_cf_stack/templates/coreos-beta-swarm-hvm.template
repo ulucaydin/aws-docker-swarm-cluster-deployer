@@ -522,7 +522,7 @@
         "LoadBalancerName" : {"Fn::Join" : ["-", ["master", { "Ref" : "Vpc" } ]]},
         "CrossZone": true,
         "SecurityGroups" : [ { "Ref" : "MasterLoadBalancerSecurityGroup" } ],
-        "Subnets" : [{ "Ref" : "PubSubnetAz1" }, { "Ref" : "PubSubnetAz2" }, { "Ref" : "PubSubnetAz3" }],
+        "Subnets" : [{ "Ref" : "PrivateSubnetAz1" }, { "Ref" : "PrivateSubnetAz2" }, { "Ref" : "PrivateSubnetAz3" }],
         "Listeners" :
           [ {
             "LoadBalancerPort" : "2379",
@@ -546,6 +546,7 @@
     },
 
     "MasterLaunchConfiguration" : {
+      "DependsOn" : [ "NAT" ],
       "Type" : "AWS::AutoScaling::LaunchConfiguration",
       "Properties" : {
         "ImageId" : { "Fn::FindInMap" : [ "RegionMap", { "Ref" : "AWS::Region" }, "AMI" ] },
@@ -575,7 +576,7 @@
       "Properties" : {
         "AvailabilityZones" :
           [ { "Fn::Select" : [ "0", { "Ref" : "VpcAvailabilityZones" } ] }, { "Fn::Select" : [ "1", { "Ref" : "VpcAvailabilityZones" } ] }, { "Fn::Select" : [ "2", { "Ref" : "VpcAvailabilityZones" } ] } ],
-        "VPCZoneIdentifier" : [ { "Fn::Join" : [",", [ { "Ref" : "PubSubnetAz1" }, { "Ref" : "PubSubnetAz2" }, { "Ref" : "PubSubnetAz3" } ] ] } ],
+        "VPCZoneIdentifier" : [ { "Fn::Join" : [",", [ { "Ref" : "PrivateSubnetAz1" }, { "Ref" : "PrivateSubnetAz2" }, { "Ref" : "PrivateSubnetAz3" } ] ] } ],
         "LaunchConfigurationName" : { "Ref" : "MasterLaunchConfiguration" },
         "LoadBalancerNames" : [ { "Ref" : "MasterLoadBalancer" } ],
         "MinSize" : "3",

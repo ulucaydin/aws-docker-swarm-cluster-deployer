@@ -6,6 +6,8 @@
           content: |
             [Service]
             Environment=\"DOCKER_OPTS=--label=storage=true --cluster-store=etcd://", { "Fn::GetAtt" : [ "MasterLoadBalancer", "DNSName" ] }, ":2379  --cluster-advertise=eth0:4243\"
+            Restart=always
+            RestartSec=3
 
     - name: docker-swarm.service
       command: start
@@ -15,7 +17,8 @@
         After=docker.service
 
         [Service]
-        Restart=no
+        Restart=always
+        RestartSec=3
         ExecStart=/usr/bin/docker run --name docker-swarm -d swarm join --addr=${{ advertised_ip_address }}_ipv4:4243 etcd://", { "Fn::GetAtt" : [ "MasterLoadBalancer", "DNSName" ] }, ":2379/swarm
 
     - name: rpc-statd.service

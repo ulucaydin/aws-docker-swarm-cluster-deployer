@@ -9,6 +9,8 @@
         - name: 10-docker_opts.conf
           content: |
             [Service]
+            Restart=always
+            RestartSec=3
             Environment=\"DOCKER_OPTS=--cluster-store=etcd://localhost:2379 --cluster-advertise=${{ advertised_ip_address }}_ipv4:4243\"
     - name: docker-swarm.service
       command: start
@@ -18,5 +20,6 @@
         After=docker.service
 
         [Service]
-        Restart=no
+        Restart=always
+        RestartSec=3
         ExecStart=/usr/bin/docker run -p 4000:4000 -d swarm manage -H :4000 --replication --advertise $private_ipv4:4000 etcd://$private_ipv4:2379/swarm
