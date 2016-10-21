@@ -507,7 +507,7 @@
           }],
         "HealthCheck" : {
           "Target" : { "Fn::Join" : [ "", ["HTTP:80", "/"]]},
-          "HealthyThreshold" : "5",
+          "HealthyThreshold" : "2",
           "UnhealthyThreshold" : "3",
           "Interval" : "30",
           "Timeout" : "5"
@@ -537,7 +537,7 @@
         ],
         "HealthCheck" : {
           "Target" : { "Fn::Join" : [ "", ["HTTP:2379", "/health"]]},
-          "HealthyThreshold" : "5",
+          "HealthyThreshold" : "2",
           "UnhealthyThreshold" : "3",
           "Interval" : "30",
           "Timeout" : "5"
@@ -551,7 +551,7 @@
       "Properties" : {
         "ImageId" : { "Fn::FindInMap" : [ "RegionMap", { "Ref" : "AWS::Region" }, "AMI" ] },
         "InstanceType" : { "Ref" : "InstanceType"},
-        "AssociatePublicIpAddress" : true,
+        "AssociatePublicIpAddress" : false,
         "KeyName" : { "Ref" : "KeyName"},
         "SecurityGroups" : [ { "Ref" : "MasterSecurityGroup"} ],
         "UserData" :  { "Fn::Base64" : {"Fn::Join" : [ "", ["{{ master_cloud_config }}"] ]} }
