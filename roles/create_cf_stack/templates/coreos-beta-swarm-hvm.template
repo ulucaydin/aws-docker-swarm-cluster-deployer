@@ -506,7 +506,7 @@
             "Protocol" : "HTTP"
           }],
         "HealthCheck" : {
-          "Target" : { "Fn::Join" : [ "", ["HTTP:80", "/"]]},
+          "Target" : { "Fn::Join" : [ "", ["HTTP:80", "/health"]]},
           "HealthyThreshold" : "2",
           "UnhealthyThreshold" : "3",
           "Interval" : "30",
@@ -550,7 +550,7 @@
       "Type" : "AWS::AutoScaling::LaunchConfiguration",
       "Properties" : {
         "ImageId" : { "Fn::FindInMap" : [ "RegionMap", { "Ref" : "AWS::Region" }, "AMI" ] },
-        "InstanceType" : { "Ref" : "InstanceType"},
+        "InstanceType" : "t2.small",
         "AssociatePublicIpAddress" : false,
         "KeyName" : { "Ref" : "KeyName"},
         "SecurityGroups" : [ { "Ref" : "MasterSecurityGroup"} ],
@@ -582,6 +582,8 @@
         "MinSize" : "3",
         "MaxSize" : "12",
         "DesiredCapacity" : { "Ref" : "MasterClusterSize"},
+        "HealthCheckType": "ELB",
+        "HealthCheckGracePeriod": "500",
         "Tags": [
           { "Key" : "Name", "Value" : { "Fn::Join": [ "-", [ { "Ref": "AWS::StackName"}, "Master" ] ] }, "PropagateAtLaunch" : "true" }
         ]
