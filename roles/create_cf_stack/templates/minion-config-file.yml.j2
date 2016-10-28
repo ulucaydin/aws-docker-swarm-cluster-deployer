@@ -19,4 +19,4 @@
         [Service]
         Restart=always
         RestartSec=5
-        ExecStart=/usr/bin/docker run --restart=always --name docker-swarm -d swarm join --addr=${{ advertised_ip_address }}_ipv4:4243 etcd://", { "Fn::GetAtt" : [ "MasterLoadBalancer", "DNSName" ] }, ":2379/swarm
+        ExecStart=/usr/bin/docker run --restart=always --name docker-swarm -d swarm --experimental join --addr=${{ advertised_ip_address }}_ipv4:4243 etcd://", { "Fn::GetAtt" : [ "MasterLoadBalancer", "DNSName" ] }, ":2379/swarm
