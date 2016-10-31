@@ -405,7 +405,10 @@
         "SecurityGroupIngress" : [
           { "IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : { "Ref" : "AllowSSHFrom" } },
           { "IpProtocol" : "tcp", "FromPort" : "0", "ToPort" : "65535", "CidrIp" : "10.203.0.0/16" },
-          { "IpProtocol" : "udp", "FromPort" : "0", "ToPort" : "65535", "CidrIp" : "10.203.0.0/16" }
+          { "IpProtocol" : "udp", "FromPort" : "0", "ToPort" : "65535", "CidrIp" : "10.203.0.0/16" },
+        ],
+        "SecurityGroupEgress" :  [ 
+          { "IpProtocol" : "tcp", "FromPort" : "1", "ToPort" : "65535", "CidrIp" : "0.0.0.0/0" }
         ],
         "Tags": [
           { "Key" : "Name", "Value" : { "Fn::Join": [ "-", [ { "Ref": "AWS::StackName"}, "Node-SG" ] ] } }
@@ -483,12 +486,9 @@
           "ToPort" : "443",
           "CidrIp" : "0.0.0.0/0"
         } ],
-        "SecurityGroupEgress" : [ {
-          "IpProtocol" : "tcp",
-          "FromPort" : "80",
-          "ToPort" : "80",
-          "CidrIp" : "0.0.0.0/0"
-        } ]
+        "SecurityGroupEgress" :  [ 
+          { "IpProtocol" : "tcp", "FromPort" : "1", "ToPort" : "65535", "CidrIp" : "0.0.0.0/0" }
+        ]
       }
     },
 
@@ -506,11 +506,11 @@
             "Protocol" : "HTTP"
           }],
         "HealthCheck" : {
-          "Target" : { "Fn::Join" : [ "", ["HTTP:80", "/health"]]},
+          "Target" : { "Fn::Join" : [ "", ["HTTP:4243", "/info"]]},
           "HealthyThreshold" : "2",
           "UnhealthyThreshold" : "3",
           "Interval" : "30",
-          "Timeout" : "5"
+          "Timeout" : "15"
         }
       }
     },
@@ -598,6 +598,8 @@
         "VPCZoneIdentifier" : [ { "Fn::Join" : [",", [ { "Ref" : "PrivateSubnetAz1" }, { "Ref" : "PrivateSubnetAz2" }, { "Ref" : "PrivateSubnetAz3" } ] ] } ],
         "LaunchConfigurationName" : { "Ref" : "NodeLaunchConfiguration" },
         "LoadBalancerNames" : [ { "Ref" : "NodeLoadBalancer" } ],
+        "HealthCheckGracePeriod" : "500",
+        "HealthCheckType" : "ELB",
         "MinSize" : "3",
         "MaxSize" : "12",
         "DesiredCapacity" : { "Ref" : "NodeClusterSize"},
@@ -681,6 +683,9 @@
           [ { "Fn::Select" : [ "0", { "Ref" : "VpcAvailabilityZones" } ] }, { "Fn::Select" : [ "1", { "Ref" : "VpcAvailabilityZones" } ] }, { "Fn::Select" : [ "2", { "Ref" : "VpcAvailabilityZones" } ] } ],
         "VPCZoneIdentifier" : [ { "Fn::Join" : [",", [ { "Ref" : "PrivateSubnetAz1" }, { "Ref" : "PrivateSubnetAz2" }, { "Ref" : "PrivateSubnetAz3" } ] ] } ],
         "LaunchConfigurationName" : { "Ref" : "StorageNodeLaunchConfiguration" },
+        "LoadBalancerNames" : [ { "Ref" : "NodeLoadBalancer" } ],
+        "HealthCheckType" : "ELB",
+        "HealthCheckGracePeriod" : "500",
         "MinSize" : "1",
         "MaxSize" : "3",
         "DesiredCapacity" : "3",
