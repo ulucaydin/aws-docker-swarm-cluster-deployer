@@ -493,6 +493,7 @@
     },
 
     "NodeLoadBalancer" : {
+      "DependsOn" : [ "InternetGateway" ],
       "Type" : "AWS::ElasticLoadBalancing::LoadBalancer",
       "Properties" : {
         "LoadBalancerName" : {"Fn::Join" : ["-", ["node", { "Ref" : "Vpc" } ]]},
@@ -538,9 +539,9 @@
         "HealthCheck" : {
           "Target" : { "Fn::Join" : [ "", ["HTTP:2379", "/health"]]},
           "HealthyThreshold" : "2",
-          "UnhealthyThreshold" : "3",
+          "UnhealthyThreshold" : "4",
           "Interval" : "30",
-          "Timeout" : "5"
+          "Timeout" : "7"
         }
       }
     },
