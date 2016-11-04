@@ -25,6 +25,7 @@
     aws_secret_key: "{{ aws_secret_key }}"
     template: "cf_template"
     region: "{{ cf_region }}"
+    disable_rollback: "{{ cf_disable_rollback }}"
     template_parameters:
       InstanceType: "{{ cf_instance_type }}"
       NodeClusterSize: "{{ cf_node_cluster_size }}"

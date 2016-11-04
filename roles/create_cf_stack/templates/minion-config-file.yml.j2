@@ -35,4 +35,5 @@
         TimeoutStartSec=0
         ExecStartPre=-/usr/bin/docker pull shashiranjan84/aws-ecr-helper:latest
         ExecStart=/usr/bin/docker run  --name ecr-cred-helper --rm -v /opt/bin:/go/src/github.com/awslabs/amazon-ecr-credential-helper/bin/local/ shashiranjan84/aws-ecr-helper:latest
+        ExecStop=/usr/bin/docker  rmi shashiranjan84/aws-ecr-helper:latest
 
