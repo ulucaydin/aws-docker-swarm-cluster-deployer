@@ -531,18 +531,17 @@
     },
 
     "NodeLoadBalancer" : {
-      "DependsOn" : [ "InternetGateway" ],
       "Type" : "AWS::ElasticLoadBalancing::LoadBalancer",
       "Properties" : {
-        "LoadBalancerName" : {"Fn::Join" : ["-", ["node", { "Ref" : "Vpc" } ]]},
+        "Scheme" : "internal",
+        "LoadBalancerName" : {"Fn::Join" : ["-", ["node-health", { "Ref" : "Vpc" } ]]},
         "CrossZone": true,
-        "SecurityGroups" : [ { "Ref" : "NodeLoadBalancerSecurityGroup" } ],
-        "Subnets" : [{ "Ref" : "PubSubnetAz1" }, { "Ref" : "PubSubnetAz2" }, { "Ref" : "PubSubnetAz3" }],
+        "Subnets" : [{ "Ref" : "PubSubnetAz1" }, { "Ref" : "PubSubnetAz2" }, { "Ref" : "PubSubnetAz3" } ],
         "Listeners" :
           [ {
-            "LoadBalancerPort" : "80",
-            "InstancePort" : "80",
-            "Protocol" : "HTTP"
+            "LoadBalancerPort" : "4243",
+            "InstancePort" : "4243",
+            "Protocol" : "TCP"
           }],
         "HealthCheck" : {
           "Target" : { "Fn::Join" : [ "", ["HTTP:4243", "/info"]]},
