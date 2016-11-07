@@ -3,19 +3,19 @@
   "Description" : "CoreOS cluster running swarm",
 
   "Mappings" : {
-      "VpcCidrs" : {
-        "eu-central-1" : { "vpc" : "10.203.0.0/16", "pubsubnet1" : "10.203.0.128/25", "pubsubnet2" : "10.203.1.128/25", "pubsubnet3" : "10.203.2.128/25", "privsubnet1" : "10.203.0.0/25", "privsubnet2" : "10.203.1.0/25", "privsubnet3" : "10.203.2.0/25" },
-        "eu-west-1" : { "vpc" : "10.203.0.0/16", "pubsubnet1" : "10.203.0.128/25", "pubsubnet2" : "10.203.1.128/25", "pubsubnet3" : "10.203.2.128/25", "privsubnet1" : "10.203.0.0/25", "privsubnet2" : "10.203.1.0/25", "privsubnet3" : "10.203.2.0/25" },
-        "us-east-1" : { "vpc" : "10.203.0.0/16", "pubsubnet1" : "10.203.0.128/25", "pubsubnet2" : "10.203.1.128/25", "pubsubnet3" : "10.203.2.128/25", "privsubnet1" : "10.203.0.0/25", "privsubnet2" : "10.203.1.0/25", "privsubnet3" : "10.203.2.0/25" },
-        "us-west-1" : { "vpc" : "10.203.0.0/16", "pubsubnet1" : "10.203.0.128/25", "pubsubnet2" : "10.203.1.128/25", "pubsubnet3" : "10.203.2.128/25", "privsubnet1" : "10.203.0.0/25", "privsubnet2" : "10.203.1.0/25", "privsubnet3" : "10.203.2.0/25" },
-        "us-west-2" : { "vpc" : "10.203.0.0/16", "pubsubnet1" : "10.203.0.128/25", "pubsubnet2" : "10.203.1.128/25", "pubsubnet3" : "10.203.2.128/25", "privsubnet1" : "10.203.0.0/25", "privsubnet2" : "10.203.1.0/25", "privsubnet3" : "10.203.2.0/25" }
-      },
+    "VpcCidrs" : {
+      "eu-central-1" : { "vpc" : "10.203.0.0/16", "pubsubnet1" : "10.203.0.128/25", "pubsubnet2" : "10.203.1.128/25", "pubsubnet3" : "10.203.2.128/25", "privsubnet1" : "10.203.0.0/25", "privsubnet2" : "10.203.1.0/25", "privsubnet3" : "10.203.2.0/25" },
+      "eu-west-1" : { "vpc" : "10.203.0.0/16", "pubsubnet1" : "10.203.0.128/25", "pubsubnet2" : "10.203.1.128/25", "pubsubnet3" : "10.203.2.128/25", "privsubnet1" : "10.203.0.0/25", "privsubnet2" : "10.203.1.0/25", "privsubnet3" : "10.203.2.0/25" },
+      "us-east-1" : { "vpc" : "10.203.0.0/16", "pubsubnet1" : "10.203.0.128/25", "pubsubnet2" : "10.203.1.128/25", "pubsubnet3" : "10.203.2.128/25", "privsubnet1" : "10.203.0.0/25", "privsubnet2" : "10.203.1.0/25", "privsubnet3" : "10.203.2.0/25" },
+      "us-west-1" : { "vpc" : "10.203.0.0/16", "pubsubnet1" : "10.203.0.128/25", "pubsubnet2" : "10.203.1.128/25", "pubsubnet3" : "10.203.2.128/25", "privsubnet1" : "10.203.0.0/25", "privsubnet2" : "10.203.1.0/25", "privsubnet3" : "10.203.2.0/25" },
+      "us-west-2" : { "vpc" : "10.203.0.0/16", "pubsubnet1" : "10.203.0.128/25", "pubsubnet2" : "10.203.1.128/25", "pubsubnet3" : "10.203.2.128/25", "privsubnet1" : "10.203.0.0/25", "privsubnet2" : "10.203.1.0/25", "privsubnet3" : "10.203.2.0/25" }
+    },
 
-      "RegionMap" : {
-          "us-east-1" : { "AMI" : "ami-e61d52f1"},
-          "us-west-2" : { "AMI" : "ami-b0c21ad0" },
-          "us-west-1" : { "AMI" : "ami-217d3441"}
-      },
+    "RegionMap" : {
+        "us-east-1" : { "AMI" : "ami-e61d52f1"},
+        "us-west-2" : { "AMI" : "ami-b0c21ad0" },
+        "us-west-1" : { "AMI" : "ami-217d3441"}
+    },
   },
 
   "Parameters" : {
@@ -407,7 +407,7 @@
           { "IpProtocol" : "tcp", "FromPort" : "0", "ToPort" : "65535", "CidrIp" : "10.203.0.0/16" },
           { "IpProtocol" : "udp", "FromPort" : "0", "ToPort" : "65535", "CidrIp" : "10.203.0.0/16" },
         ],
-        "SecurityGroupEgress" :  [ 
+        "SecurityGroupEgress" :  [
           { "IpProtocol" : "tcp", "FromPort" : "1", "ToPort" : "65535", "CidrIp" : "0.0.0.0/0" }
         ],
         "Tags": [
@@ -486,25 +486,62 @@
           "ToPort" : "443",
           "CidrIp" : "0.0.0.0/0"
         } ],
-        "SecurityGroupEgress" :  [ 
+        "SecurityGroupEgress" :  [
           { "IpProtocol" : "tcp", "FromPort" : "1", "ToPort" : "65535", "CidrIp" : "0.0.0.0/0" }
         ]
       }
     },
 
+    "NodeHTTPLoadBalancer" : {
+      "Type" : "AWS::ElasticLoadBalancingV2::LoadBalancer",
+      "DependsOn": ["NodeLoadBalancerSecurityGroup", "PubSubnetAz1", "PubSubnetAz2", "PubSubnetAz3" ],
+      "Properties" : {
+        "Name" : {"Fn::Join" : ["-", ["node-http", { "Ref" : "Vpc" } ]]},
+        "Scheme" : "internet-facing",
+        "SecurityGroups" : [ { "Ref" : "NodeLoadBalancerSecurityGroup" } ],
+        "Subnets" : [{ "Ref" : "PubSubnetAz1" }, { "Ref" : "PubSubnetAz2" }, { "Ref" : "PubSubnetAz3" }]
+      }
+    },
+
+    "NodeHTTPTargetGroup" : {
+      "Type" : "AWS::ElasticLoadBalancingV2::TargetGroup",
+      "Properties" : {
+        "HealthCheckIntervalSeconds" : 60,
+        "UnhealthyThresholdCount" : 10,
+        "HealthCheckPath" : "/health",
+        "Name" : {"Fn::Join" : ["-", ["swarm-nodes-http", { "Ref" : "Vpc" } ]]},
+        "Port" : 80,
+        "Protocol" : "HTTP",
+        "VpcId" : { "Ref": "Vpc" }
+      }
+    },
+
+    "NodeLoadBalancerHTTPListener": {
+      "Type": "AWS::ElasticLoadBalancingV2::Listener",
+      "DependsOn" : ["NodeHTTPLoadBalancer", "NodeHTTPTargetGroup"],
+      "Properties": {
+        "DefaultActions": [{
+          "Type": "forward",
+          "TargetGroupArn": { "Ref": "NodeHTTPTargetGroup" }
+        }],
+        "LoadBalancerArn": { "Ref": "NodeHTTPLoadBalancer" },
+        "Port": "80",
+        "Protocol": "HTTP"
+      }
+    },
+
     "NodeLoadBalancer" : {
-      "DependsOn" : [ "InternetGateway" ],
       "Type" : "AWS::ElasticLoadBalancing::LoadBalancer",
       "Properties" : {
-        "LoadBalancerName" : {"Fn::Join" : ["-", ["node", { "Ref" : "Vpc" } ]]},
+        "Scheme" : "internal",
+        "LoadBalancerName" : {"Fn::Join" : ["-", ["node-health", { "Ref" : "Vpc" } ]]},
         "CrossZone": true,
-        "SecurityGroups" : [ { "Ref" : "NodeLoadBalancerSecurityGroup" } ],
-        "Subnets" : [{ "Ref" : "PubSubnetAz1" }, { "Ref" : "PubSubnetAz2" }, { "Ref" : "PubSubnetAz3" }],
+        "Subnets" : [{ "Ref" : "PubSubnetAz1" }, { "Ref" : "PubSubnetAz2" }, { "Ref" : "PubSubnetAz3" } ],
         "Listeners" :
           [ {
-            "LoadBalancerPort" : "80",
-            "InstancePort" : "80",
-            "Protocol" : "HTTP"
+            "LoadBalancerPort" : "4243",
+            "InstancePort" : "4243",
+            "Protocol" : "TCP"
           }],
         "HealthCheck" : {
           "Target" : { "Fn::Join" : [ "", ["HTTP:4243", "/info"]]},
@@ -593,6 +630,7 @@
 
     "NodeAutoScalingGroup" : {
       "Type" : "AWS::AutoScaling::AutoScalingGroup",
+      "DependsOn" : ["NodeLaunchConfiguration", "NodeLoadBalancer", "NodeHTTPTargetGroup"],
       "Properties" : {
         "AvailabilityZones" :
           [ { "Fn::Select" : [ "0", { "Ref" : "VpcAvailabilityZones" } ] }, { "Fn::Select" : [ "1", { "Ref" : "VpcAvailabilityZones" } ] }, { "Fn::Select" : [ "2", { "Ref" : "VpcAvailabilityZones" } ] } ],
@@ -601,9 +639,10 @@
         "LoadBalancerNames" : [ { "Ref" : "NodeLoadBalancer" } ],
         "HealthCheckGracePeriod" : "500",
         "HealthCheckType" : "ELB",
+        "TargetGroupARNs" : [{ "Ref" : "NodeHTTPTargetGroup" }],
         "MinSize" : "3",
         "MaxSize" : "12",
-        "DesiredCapacity" : { "Ref" : "NodeClusterSize"},
+        "DesiredCapacity" : { "Ref" : "NodeClusterSize" },
         "Tags": [
           { "Key" : "Name", "Value" : { "Fn::Join": [ "-", [ { "Ref": "AWS::StackName"}, "Node" ] ] }, "PropagateAtLaunch" : "true" }
         ]
@@ -697,9 +736,6 @@
     },
   },
 
-
-
-
   "Outputs" : {
 
     "MasterDockerPs" : {
@@ -710,9 +746,9 @@
       "Description" : "ELB of Swarm and Etcd Masters",
       "Value" : { "Fn::GetAtt" : [ "MasterLoadBalancer", "DNSName" ] }
     },
-    "NodeDNS" : {
-      "Description" : "ELB of Swarm Nodes",
-      "Value" : { "Fn::GetAtt" : [ "NodeLoadBalancer", "DNSName" ] }
+    "NodeHTTPLoadBalancer" : {
+      "Description" : "Node HTTP load balancer",
+      "Value" : { "Fn::GetAtt" : [ "NodeHTTPLoadBalancer", "DNSName" ] }
     }
   }
 
