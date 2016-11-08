@@ -76,8 +76,14 @@
       "Type": "String",
       "MinLength": "1",
       "Default": "/opt/mashape"
+    },
+    "EBSVolumeSize" : {
+      "Description" : "EBS volume for root disk",
+      "Type": "Number",
+      "MinValue" : "10",
+      "MaxValue" : "100",
+      "Default": "50"
     }
-
   },
 
   "Resources" : {
@@ -155,6 +161,7 @@
 
     "PublicRouteViaIgw" : {
       "Type" : "AWS::EC2::Route",
+      "DependsOn" : ["AttachGateway"],
       "Properties" : {
         "RouteTableId" : { "Ref" : "RouteViaIgw" },
         "DestinationCidrBlock" : "0.0.0.0/0",
@@ -574,7 +581,7 @@
           }
         ],
         "HealthCheck" : {
-          "Target" : { "Fn::Join" : [ "", ["HTTP:2379", "/health"]]},
+          "Target" : { "Fn::Join" : [ "", ["HTTP:4243", "/info"]]},
           "HealthyThreshold" : "2",
           "UnhealthyThreshold" : "4",
           "Interval" : "30",
@@ -605,6 +612,9 @@
         "AssociatePublicIpAddress" : false,
         "KeyName" : { "Ref" : "KeyName"},
         "SecurityGroups" : [ { "Ref" : "NodeSecurityGroup"} ],
+        "BlockDeviceMappings" : [
+          { "DeviceName" : "/dev/xvda", "Ebs" : { "VolumeSize" : { "Ref" : "EBSVolumeSize" } } }
+        ],
         "UserData" :  { "Fn::Base64" : {"Fn::Join" : [ "", ["{{ minion_cloud_config }}"] ]} }
       }
     },
@@ -712,6 +722,9 @@
         "InstanceType": { "Ref": "InstanceType" },
         "KeyName": { "Ref": "KeyName" },
         "SecurityGroups": [ { "Ref": "EfsSecurityGroup" }, { "Ref": "NodeSecurityGroup"} ],
+        "BlockDeviceMappings" : [
+          { "DeviceName" : "/dev/xvda", "Ebs" : { "VolumeSize" : { "Ref" : "EBSVolumeSize" } } }
+        ],
         "UserData" :  { "Fn::Base64" : {"Fn::Join" : [ "", ["{{ storage_cloud_config }}"] ]} }
       }
     },

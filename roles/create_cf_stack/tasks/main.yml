@@ -27,6 +27,7 @@
     region: "{{ cf_region }}"
     disable_rollback: "{{ cf_disable_rollback }}"
     template_parameters:
+      EBSVolumeSize: "{{ cf_ebs_size }}"
       InstanceType: "{{ cf_instance_type }}"
       NodeClusterSize: "{{ cf_node_cluster_size }}"
       MasterClusterSize: "{{ cf_master_cluster_size }}"
