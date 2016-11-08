@@ -438,8 +438,8 @@
           { "IpProtocol" : "tcp", "FromPort" : "1", "ToPort" : "65535", "CidrIp" : "0.0.0.0/0" },
           { "IpProtocol" : "udp", "FromPort" : "1", "ToPort" : "65535", "CidrIp" : "0.0.0.0/0" }
         ]
-      },
-    }
+      }
+    },
 
     "NodeLoadBalancerSecurityGroup" : {
       "Type" : "AWS::EC2::SecurityGroup",
@@ -459,7 +459,7 @@
           "CidrIp" : "0.0.0.0/0"
         } ],
         "SecurityGroupEgress" :  [
-          { "IpProtocol" : "tcp", "FromPort" : "1", "ToPort" : "65535", "CidrIp" : "0.0.0.0/0" }
+          { "IpProtocol" : "tcp", "FromPort" : "1", "ToPort" : "65535", "CidrIp" : "0.0.0.0/0" },
           { "IpProtocol" : "udp", "FromPort" : "1", "ToPort" : "65535", "CidrIp" : "0.0.0.0/0" }
         ]
       }
