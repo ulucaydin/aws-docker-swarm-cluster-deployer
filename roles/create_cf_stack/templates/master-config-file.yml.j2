@@ -4,6 +4,14 @@
       command: start
     - name: fleet.service
       command: start
+    - name: docker.service
+      drop-ins:
+        - name: 10-docker_opts.conf
+          content: |
+            [Service]
+            Restart=always
+            RestartSec=3
+            Environment=\"DOCKER_OPTS=--cluster-store=etcd://localhost:2379 --cluster-advertise=${{ advertised_ip_address }}_ipv4:4243\"
     - name: docker-swarm.service
       command: start
       content: |
@@ -12,5 +20,30 @@
         After=docker.service
 
         [Service]
-        Restart=no
-        ExecStart=/usr/bin/docker run -p 4000:4000 -d swarm manage -H :4000 --replication --advertise $public_ipv4:4000 etcd://$public_ipv4:2379/swarm
+        Restart=always
+        RestartSec=3
+        ExecStart=/usr/bin/docker run --restart=always -p 4000:4000 -d swarm --experimental manage -H :4000 --replication --advertise $private_ipv4:4000 etcd://$private_ipv4:2379/swarm
+
+    - name: docker-reschedule-start.service
+      content: |
+        [Unit]
+        Description=Start any created docker containers that haven't properly started (docker swarm bug)
+
+        [Service]
+        Type=oneshot
+        ExecStart=/bin/sh -c '/usr/bin/docker -H tcp://localhost:4000 start $(/usr/bin/docker -H tcp://localhost:4000 ps -a -f status=created -q) | true'
+
+        [Install]
+        WantedBy=local.target
+
+    - name: docker-reschedule-start.timer
+      command: start
+      content: |
+        [Unit]
+        Description=Run the docker start service every 5 minutes
+
+        [Timer]
+        OnCalendar=*:0/5
+
+        [Install]
+        WantedBy=local.target
