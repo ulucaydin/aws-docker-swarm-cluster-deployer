@@ -20,9 +20,10 @@
         After=docker.service
 
         [Service]
-        Restart=always
+        Restart=on-failure
         RestartSec=3
-        ExecStart=/usr/bin/docker run --restart=always -p 4000:4000 -d swarm --experimental manage -H :4000 --replication --advertise $private_ipv4:4000 etcd://$private_ipv4:2379/swarm
+        ExecStartPre=-/usr/bin/docker rm docker-swarm
+        ExecStart=/usr/bin/docker run -p 4000:4000 -d swarm --experimental manage -H :4000 --replication --advertise $private_ipv4:4000 etcd://$private_ipv4:2379/swarm
 
     - name: docker-reschedule-start.service
       content: |

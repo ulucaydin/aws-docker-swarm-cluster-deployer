@@ -17,9 +17,10 @@
         After=docker.service
 
         [Service]
-        Restart=always
+        Restart=on-failure
         RestartSec=3
-        ExecStart=/usr/bin/docker run --restart=always --name docker-swarm -d swarm --experimental join --addr=${{ advertised_ip_address }}_ipv4:4243 etcd://", { "Fn::GetAtt" : [ "MasterLoadBalancer", "DNSName" ] }, ":2379/swarm
+        ExecStartPre=-/usr/bin/docker rm docker-swarm
+        ExecStart=/usr/bin/docker run --name docker-swarm -d swarm --experimental join --addr=${{ advertised_ip_address }}_ipv4:4243 etcd://", { "Fn::GetAtt" : [ "MasterLoadBalancer", "DNSName" ] }, ":2379/swarm
 
     - name: ecr-credential-helper.service
       command: start
@@ -30,7 +31,9 @@
         Requires=docker.service
 
         [Service]
-        TimeoutStartSec=0
+        Restart=on-failure
+        RestartSec=3
+        ExecStartPre=-/usr/bin/docker rm ecr-cred-helper
         ExecStartPre=-/usr/bin/docker pull shashiranjan84/aws-ecr-helper:latest
         ExecStart=/usr/bin/docker run  --name ecr-cred-helper --rm -v /opt/bin:/go/src/github.com/awslabs/amazon-ecr-credential-helper/bin/local/ shashiranjan84/aws-ecr-helper:latest
         ExecStop=/usr/bin/docker  rmi shashiranjan84/aws-ecr-helper:latest
