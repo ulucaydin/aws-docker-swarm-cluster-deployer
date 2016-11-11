@@ -12,9 +12,9 @@
     },
 
     "RegionMap" : {
-        "us-east-1" : { "AMI" : "ami-e61d52f1"},
-        "us-west-2" : { "AMI" : "ami-b0c21ad0" },
-        "us-west-1" : { "AMI" : "ami-217d3441"}
+      "us-east-1" : { "AMI" : "ami-220f2b35"},
+      "us-west-2" : { "AMI" : "ami-5ab5143a" },
+      "us-west-1" : { "AMI" : "ami-5f52183f"}
     }
   },
 
@@ -561,7 +561,7 @@
       "Type" : "AWS::AutoScaling::LaunchConfiguration",
       "Properties" : {
         "ImageId" : { "Fn::FindInMap" : [ "RegionMap", { "Ref" : "AWS::Region" }, "AMI" ] },
-        "InstanceType" : "t2.small",
+        "InstanceType" : "t2.medium",
         "AssociatePublicIpAddress" : false,
         "KeyName" : { "Ref" : "KeyName"},
         "SecurityGroups" : [ { "Ref" : "MasterSecurityGroup"} ],
@@ -586,6 +586,7 @@
     },
 
     "MasterAutoScalingGroup" : {
+      "DependsOn" : [ "InternetGateway", "NAT" ],
       "Type" : "AWS::AutoScaling::AutoScalingGroup",
       "Properties" : {
         "AvailabilityZones" :
@@ -596,7 +597,6 @@
         "MinSize" : "4",
         "MaxSize" : "12",
         "DesiredCapacity" : "4",
-        "HealthCheckType": "ELB",
         "HealthCheckGracePeriod": "1600",
         "Tags": [
           { "Key" : "Name", "Value" : { "Fn::Join": [ "-", [ { "Ref": "AWS::StackName"}, "Master" ] ] }, "PropagateAtLaunch" : "true" }
@@ -702,7 +702,6 @@
         "VPCZoneIdentifier" : [ { "Fn::Join" : [",", [ { "Ref" : "PrivateSubnetAz1" }, { "Ref" : "PrivateSubnetAz2" }, { "Ref" : "PrivateSubnetAz3" } ] ] } ],
         "LaunchConfigurationName" : { "Ref" : "StorageNodeLaunchConfiguration" },
         "LoadBalancerNames" : [ { "Ref" : "NodeLoadBalancer" } ],
-        "HealthCheckType" : "ELB",
         "HealthCheckGracePeriod" : "500",
         "MinSize" : "1",
         "MaxSize" : "3",

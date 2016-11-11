@@ -8,8 +8,8 @@
           content: |
             [Service]
             Environment=\"DOCKER_OPTS=--cluster-store=etcd://", { "Fn::GetAtt" : [ "MasterLoadBalancer", "DNSName" ] }, ":2379  --cluster-advertise=eth0:4243\"
-            Restart=always
-            RestartSec=5
+            Restart=on-failure
+            RestartSec=10
 
     - name: docker-swarm.service
       command: start
@@ -19,9 +19,14 @@
         After=docker.service
 
         [Service]
-        Restart=always
-        RestartSec=5
-        ExecStart=/usr/bin/docker run --restart=always --name docker-swarm -d swarm --experimental join --addr=${{ advertised_ip_address }}_ipv4:4243 etcd://", { "Fn::GetAtt" : [ "MasterLoadBalancer", "DNSName" ] }, ":2379/swarm
+        Restart=on-failure
+        RestartSec=10
+        ExecStartPre=-/usr/bin/docker kill docker-swarm
+        ExecStartPre=-/usr/bin/docker rm docker-swarm
+        ExecStartPre=/usr/bin/docker pull swarm
+        ExecStart=/usr/bin/docker run --restart=on-failure --name docker-swarm -d swarm --experimental join --addr=${{ advertised_ip_address }}_ipv4:4243 etcd://", { "Fn::GetAtt" : [ "MasterLoadBalancer", "DNSName" ] }, ":2379/swarm
+
+
 
     - name: ecr-credential-helper.service
       command: start
@@ -36,4 +41,3 @@
         ExecStartPre=-/usr/bin/docker pull shashiranjan84/aws-ecr-helper:latest
         ExecStart=/usr/bin/docker run  --name ecr-cred-helper --rm -v /opt/bin:/go/src/github.com/awslabs/amazon-ecr-credential-helper/bin/local/ shashiranjan84/aws-ecr-helper:latest
         ExecStop=/usr/bin/docker  rmi shashiranjan84/aws-ecr-helper:latest
-
