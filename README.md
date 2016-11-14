@@ -1,7 +1,7 @@
 [![License][license]][license-url]
 
 [license-url]: http://choosealicense.com/licenses/mit/
-[license]: https://img.shields.io/npm/l/simon-promise.svg?style=flat-square
+[license]: https://img.shields.io/github/license/mashape/apistatus.svg
 
 # Ansible & Cloud Formation automation for creating Highly-Available Docker Swarm clusters on AWS
 
