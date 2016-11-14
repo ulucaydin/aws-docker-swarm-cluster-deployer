@@ -719,13 +719,9 @@
 
   "Outputs" : {
 
-    "MasterDockerPs" : {
-      "Description" : "Command to run a 'docker info' on the cluster master",
-      "Value" : { "Fn::Join" : [ "", [ "docker -H tcp://", { "Fn::GetAtt" : [ "MasterLoadBalancer", "DNSName" ] }, ":4000 info" ] ] }
-    },
-    "MasterPublicDNS" : {
-      "Description" : "ELB of Swarm and Etcd Masters",
-      "Value" : { "Fn::GetAtt" : [ "MasterLoadBalancer", "DNSName" ] }
+    "MasterDocker" : {
+      "Description" : "'docker' ELB for the cluster master",
+      "Value" : { "Fn::Join" : [ "", [ "tcp://", { "Fn::GetAtt" : [ "MasterLoadBalancer", "DNSName" ] }, ":4000" ] ] }
     },
     "NodeHTTPLoadBalancer" : {
       "Description" : "Node HTTP load balancer",
