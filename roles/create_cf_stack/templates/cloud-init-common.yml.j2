@@ -25,6 +25,8 @@ coreos:
     initial-advertise-peer-urls: http://${{ advertised_ip_address }}_ipv4:2380
     listen-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
     listen-peer-urls: http://${{ advertised_ip_address }}_ipv4:2380
+    heartbeat-interval: 600
+    election-timeout: 6000
 
   units:
     - name: docker-tcp.socket
@@ -41,4 +43,3 @@ coreos:
 
         [Install]
         WantedBy=sockets.target
-
