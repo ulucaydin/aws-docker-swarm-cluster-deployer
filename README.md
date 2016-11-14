@@ -1,3 +1,8 @@
+[![License][license]][license-url]
+
+[license-url]: http://choosealicense.com/licenses/mit/
+[license]: https://img.shields.io/npm/l/simon-promise.svg?style=flat-square
+
 # Ansible & Cloud Formation automation for creating Highly-Available Docker Swarm clusters on AWS
 
 Scalable Docker Swarm cluster deployment using the combination of AWS CloudFormation to create resources (such as EC2, VPC, AutoScaling etc..) and Ansible to automate the process with a single command. Deployment EC2 instances use CoreOS as it's ideal for this scenario.
