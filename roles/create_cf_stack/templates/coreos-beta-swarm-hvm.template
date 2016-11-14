@@ -435,7 +435,7 @@
         "VpcId" : { "Ref" : "Vpc" },
         "SecurityGroupIngress" : [
           { "IpProtocol" : "tcp", "FromPort" : "0", "ToPort" : "65535", "CidrIp": "10.203.0.0/16" },
-          { "IpProtocol" : "tcp", "FromPort" : "4000", "ToPort" : "4000", "CidrIp" : "10.203.0.0/16" },
+          { "IpProtocol" : "tcp", "FromPort" : "4000", "ToPort" : "4000", "CidrIp": { "Ref" : "AllowSSHFrom" } },
           { "IpProtocol" : "tcp", "FromPort" : "2379", "ToPort" : "2379", "CidrIp" : "0.0.0.0/0" }
         ],
         "SecurityGroupEgress" :  [
@@ -532,12 +532,12 @@
 
     "MasterLoadBalancer" : {
       "Type" : "AWS::ElasticLoadBalancing::LoadBalancer",
+      "DependsOn" : [ "PubSubnetAz1", "PubSubnetAz2", "PubSubnetAz3", "MasterLoadBalancerSecurityGroup"],
       "Properties" : {
-        "Scheme": "internal",
         "LoadBalancerName" : {"Fn::Join" : ["-", ["master", { "Ref" : "Vpc" } ]]},
         "CrossZone": true,
         "SecurityGroups" : [ { "Ref" : "MasterLoadBalancerSecurityGroup" } ],
-        "Subnets" : [{ "Ref" : "PrivateSubnetAz1" }, { "Ref" : "PrivateSubnetAz2" }, { "Ref" : "PrivateSubnetAz3" }],
+        "Subnets" : [{ "Ref" : "PubSubnetAz1" }, { "Ref" : "PubSubnetAz2" }, { "Ref" : "PubSubnetAz3" }],
         "Listeners" :
           [ {
             "LoadBalancerPort" : "2379",
