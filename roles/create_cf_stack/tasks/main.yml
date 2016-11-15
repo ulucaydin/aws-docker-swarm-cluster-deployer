@@ -35,6 +35,7 @@
       DiscoveryURL: "{{ discovery_service_url.content }}"
       VpcAvailabilityZones: "{{ cf_vpc_azs }}"
       AllowSSHFrom: "{{ ip_address }}"
+      NodeHTTPCertARN: "{{ certificate_arn }}"
     tags:
       Stack: "ansible-cloudformation"
   register: stack_creation_response
