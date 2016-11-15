@@ -1,0 +1,1718 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Docker for AWS 1.12.2 (beta9)",
+    "Mappings": {
+        "AWSInstanceType2Arch": {
+            "c3.2xlarge": {
+                "Arch": "HVM64"
+            },
+            "c3.4xlarge": {
+                "Arch": "HVM64"
+            },
+            "c3.8xlarge": {
+                "Arch": "HVM64"
+            },
+            "c3.large": {
+                "Arch": "HVM64"
+            },
+            "c3.xlarge": {
+                "Arch": "HVM64"
+            },
+            "c4.2xlarge": {
+                "Arch": "HVM64"
+            },
+            "c4.4xlarge": {
+                "Arch": "HVM64"
+            },
+            "c4.8xlarge": {
+                "Arch": "HVM64"
+            },
+            "c4.large": {
+                "Arch": "HVM64"
+            },
+            "c4.xlarge": {
+                "Arch": "HVM64"
+            },
+            "cc2.8xlarge": {
+                "Arch": "HVM64"
+            },
+            "cr1.8xlarge": {
+                "Arch": "HVM64"
+            },
+            "d2.2xlarge": {
+                "Arch": "HVM64"
+            },
+            "d2.4xlarge": {
+                "Arch": "HVM64"
+            },
+            "d2.8xlarge": {
+                "Arch": "HVM64"
+            },
+            "d2.xlarge": {
+                "Arch": "HVM64"
+            },
+            "g2.2xlarge": {
+                "Arch": "HVMG2"
+            },
+            "hi1.4xlarge": {
+                "Arch": "HVM64"
+            },
+            "hs1.8xlarge": {
+                "Arch": "HVM64"
+            },
+            "i2.2xlarge": {
+                "Arch": "HVM64"
+            },
+            "i2.4xlarge": {
+                "Arch": "HVM64"
+            },
+            "i2.8xlarge": {
+                "Arch": "HVM64"
+            },
+            "i2.xlarge": {
+                "Arch": "HVM64"
+            },
+            "m3.2xlarge": {
+                "Arch": "HVM64"
+            },
+            "m3.large": {
+                "Arch": "HVM64"
+            },
+            "m3.medium": {
+                "Arch": "HVM64"
+            },
+            "m3.xlarge": {
+                "Arch": "HVM64"
+            },
+            "m4.10xlarge": {
+                "Arch": "HVM64"
+            },
+            "m4.2xlarge": {
+                "Arch": "HVM64"
+            },
+            "m4.4xlarge": {
+                "Arch": "HVM64"
+            },
+            "m4.large": {
+                "Arch": "HVM64"
+            },
+            "m4.xlarge": {
+                "Arch": "HVM64"
+            },
+            "r3.2xlarge": {
+                "Arch": "HVM64"
+            },
+            "r3.4xlarge": {
+                "Arch": "HVM64"
+            },
+            "r3.8xlarge": {
+                "Arch": "HVM64"
+            },
+            "r3.large": {
+                "Arch": "HVM64"
+            },
+            "r3.xlarge": {
+                "Arch": "HVM64"
+            },
+            "t2.large": {
+                "Arch": "HVM64"
+            },
+            "t2.medium": {
+                "Arch": "HVM64"
+            },
+            "t2.micro": {
+                "Arch": "HVM64"
+            },
+            "t2.small": {
+                "Arch": "HVM64"
+            }
+        },
+        "AWSRegionArch2AMI": {
+            "ap-northeast-1": {
+                "HVM64": "ami-3931eb58",
+                "HVMG2": "NOT_SUPPORTED"
+            },
+            "ap-northeast-2": {
+                "HVM64": "ami-acd501c2",
+                "HVMG2": "NOT_SUPPORTED"
+            },
+            "ap-south-1": {
+                "HVM64": "ami-cf0175a0",
+                "HVMG2": "NOT_SUPPORTED"
+            },
+            "ap-southeast-1": {
+                "HVM64": "ami-972c8bf4",
+                "HVMG2": "NOT_SUPPORTED"
+            },
+            "ap-southeast-2": {
+                "HVM64": "ami-2e00324d",
+                "HVMG2": "NOT_SUPPORTED"
+            },
+            "eu-central-1": {
+                "HVM64": "ami-c83cc2a7",
+                "HVMG2": "NOT_SUPPORTED"
+            },
+            "eu-west-1": {
+                "HVM64": "ami-99f8baea",
+                "HVMG2": "NOT_SUPPORTED"
+            },
+            "sa-east-1": {
+                "HVM64": "ami-7def7211",
+                "HVMG2": "NOT_SUPPORTED"
+            },
+            "us-east-1": {
+                "HVM64": "ami-de460cc9",
+                "HVMG2": "NOT_SUPPORTED"
+            },
+            "us-west-1": {
+                "HVM64": "ami-473a7227",
+                "HVMG2": "NOT_SUPPORTED"
+            },
+            "us-west-2": {
+                "HVM64": "ami-e67ba086",
+                "HVMG2": "NOT_SUPPORTED"
+            }
+        },
+        "DockerForAWS": {
+            "version": {
+                "docker": "1.12.2",
+                "forAws": "aws-v1.12.2-beta9"
+            }
+        },
+        "VpcCidrs": {
+            "pubsubnet1": {
+                "cidr": "192.168.33.0/24"
+            },
+            "pubsubnet2": {
+                "cidr": "192.168.34.0/24"
+            },
+            "vpc": {
+                "cidr": "192.168.0.0/16"
+            }
+        }
+    },
+    "Metadata": {
+        "AWS::CloudFormation::Interface": {
+            "ParameterGroups": [
+                {
+                    "Label": {
+                        "default": "Swarm Size"
+                    },
+                    "Parameters": [
+                        "ManagerSize",
+                        "ClusterSize"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Swarm Properties"
+                    },
+                    "Parameters": [
+                        "ManagerInstanceType",
+                        "InstanceType",
+                        "KeyName"
+                    ]
+                }
+            ],
+            "ParameterLabels": {
+                "ClusterSize": {
+                    "default": "Number of Swarm worker nodes?"
+                },
+                "InstanceType": {
+                    "default": "Agent worker instance type?"
+                },
+                "KeyName": {
+                    "default": "Which SSH key to use?"
+                },
+                "ManagerInstanceType": {
+                    "default": "Swarm manager instance type?"
+                },
+                "ManagerSize": {
+                    "default": "Number of Swarm managers?"
+                }
+            }
+        }
+    },
+    "Outputs": {
+        "DefaultDNSTarget": {
+            "Description": "Use this name to update your DNS records",
+            "Value": {
+                "Fn::GetAtt": [
+                    "ExternalLoadBalancer",
+                    "DNSName"
+                ]
+            }
+        },
+        "SSH": {
+            "Description": "Use this command to login to your Docker console.",
+            "Value": {
+                "Fn::Join": [
+                    "",
+                    [
+                        "ssh docker@",
+                        {
+                            "Fn::GetAtt": [
+                                "SSHLoadBalancer",
+                                "DNSName"
+                            ]
+                        }
+                    ]
+                ]
+            }
+        }
+    },
+    "Parameters": {
+        "ClusterSize": {
+            "Default": "5",
+            "Description": "Number of worker nodes in the Swarm (1-1000).",
+            "MaxValue": "1000",
+            "MinValue": "1",
+            "Type": "Number"
+        },
+        "InstanceType": {
+            "AllowedValues": [
+                "t2.micro",
+                "t2.small",
+                "t2.medium",
+                "t2.large",
+                "m4.large",
+                "m4.xlarge",
+                "m4.2xlarge",
+                "m4.4xlarge",
+                "m4.10xlarge",
+                "m3.medium",
+                "m3.large",
+                "m3.xlarge",
+                "m3.2xlarge",
+                "c4.large",
+                "c4.xlarge",
+                "c4.2xlarge",
+                "c4.4xlarge",
+                "c4.8xlarge",
+                "c3.large",
+                "c3.xlarge",
+                "c3.2xlarge",
+                "c3.4xlarge",
+                "c3.8xlarge",
+                "r3.large",
+                "r3.xlarge",
+                "r3.2xlarge",
+                "r3.4xlarge",
+                "r3.8xlarge",
+                "i2.xlarge",
+                "i2.2xlarge",
+                "i2.4xlarge",
+                "i2.8xlarge"
+            ],
+            "ConstraintDescription": "Must be a valid EC2 HVM instance type.",
+            "Default": "t2.micro",
+            "Description": "EC2 HVM instance type (t2.micro, m3.medium, etc).",
+            "Type": "String"
+        },
+        "KeyName": {
+            "ConstraintDescription": "must be the name of an existing EC2 KeyPair.",
+            "Default": "id_rsa_aws",
+            "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instances",
+            "Type": "AWS::EC2::KeyPair::KeyName"
+        },
+        "ManagerInstanceType": {
+            "AllowedValues": [
+                "t2.micro",
+                "t2.small",
+                "t2.medium",
+                "t2.large",
+                "m4.large",
+                "m4.xlarge",
+                "m4.2xlarge",
+                "m4.4xlarge",
+                "m4.10xlarge",
+                "m3.medium",
+                "m3.large",
+                "m3.xlarge",
+                "m3.2xlarge",
+                "c4.large",
+                "c4.xlarge",
+                "c4.2xlarge",
+                "c4.4xlarge",
+                "c4.8xlarge",
+                "c3.large",
+                "c3.xlarge",
+                "c3.2xlarge",
+                "c3.4xlarge",
+                "c3.8xlarge",
+                "r3.large",
+                "r3.xlarge",
+                "r3.2xlarge",
+                "r3.4xlarge",
+                "r3.8xlarge",
+                "i2.xlarge",
+                "i2.2xlarge",
+                "i2.4xlarge",
+                "i2.8xlarge"
+            ],
+            "ConstraintDescription": "Must be a valid EC2 HVM instance type.",
+            "Default": "t2.micro",
+            "Description": "EC2 HVM instance type (t2.micro, m3.medium, etc).",
+            "Type": "String"
+        },
+        "ManagerSize": {
+            "AllowedValues": [
+                "1",
+                "3",
+                "5"
+            ],
+            "Default": "3",
+            "Description": "Number of Swarm manager nodes (1, 3, 5)",
+            "Type": "Number"
+        }
+    },
+    "Resources": {
+        "AttachGateway": {
+            "DependsOn": "Vpc",
+            "Properties": {
+                "InternetGatewayId": {
+                    "Ref": "InternetGateway"
+                },
+                "VpcId": {
+                    "Ref": "Vpc"
+                }
+            },
+            "Type": "AWS::EC2::VPCGatewayAttachment"
+        },
+        "DockerLogGroup": {
+            "Properties": {
+                "LogGroupName": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            {
+                                "Ref": "AWS::StackName"
+                            },
+                            "lg"
+                        ]
+                    ]
+                },
+                "RetentionInDays": 7
+            },
+            "Type": "AWS::Logs::LogGroup"
+        },
+        "DynDBPolicies": {
+            "Properties": {
+                "PolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": [
+                                "dynamodb:PutItem",
+                                "dynamodb:DeleteItem",
+                                "dynamodb:GetItem",
+                                "dynamodb:UpdateItem",
+                                "dynamodb:Query"
+                            ],
+                            "Effect": "Allow",
+                            "Resource": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        "arn:aws:dynamodb:",
+                                        {
+                                            "Ref": "AWS::Region"
+                                        },
+                                        ":",
+                                        {
+                                            "Ref": "AWS::AccountId"
+                                        },
+                                        ":table/",
+                                        {
+                                            "Ref": "SwarmDynDBTable"
+                                        }
+                                    ]
+                                ]
+                            }
+                        }
+                    ],
+                    "Version": "2012-10-17"
+                },
+                "PolicyName": "dyndb-getput",
+                "Roles": [
+                    {
+                        "Ref": "ProxyRole"
+                    }
+                ]
+            },
+            "Type": "AWS::IAM::Policy"
+        },
+        "ExternalLoadBalancer": {
+            "DependsOn": "AttachGateway",
+            "Properties": {
+                "ConnectionSettings": {
+                    "IdleTimeout": "600"
+                },
+                "CrossZone": "true",
+                "HealthCheck": {
+                    "HealthyThreshold": "2",
+                    "Interval": "10",
+                    "Target": "TCP:2375",
+                    "Timeout": "2",
+                    "UnhealthyThreshold": "4"
+                },
+                "Listeners": [
+                    {
+                        "InstancePort": "7",
+                        "LoadBalancerPort": "7",
+                        "Protocol": "TCP"
+                    }
+                ],
+                "LoadBalancerName": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            {
+                                "Ref": "AWS::StackName"
+                            },
+                            "ELB"
+                        ]
+                    ]
+                },
+                "SecurityGroups": [
+                    {
+                        "Ref": "ExternalLoadBalancerSG"
+                    }
+                ],
+                "Subnets": [
+                    {
+                        "Ref": "PubSubnetAz1"
+                    },
+                    {
+                        "Ref": "PubSubnetAz2"
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "AWS::StackName"
+                                    },
+                                    "ELB"
+                                ]
+                            ]
+                        }
+                    }
+                ]
+            },
+            "Type": "AWS::ElasticLoadBalancing::LoadBalancer"
+        },
+        "ExternalLoadBalancerSG": {
+            "Properties": {
+                "GroupDescription": "External Load Balancer SecurityGroup",
+                "SecurityGroupIngress": [
+                    {
+                        "CidrIp": "0.0.0.0/0",
+                        "FromPort": "0",
+                        "IpProtocol": "-1",
+                        "ToPort": "65535"
+                    }
+                ],
+                "VpcId": {
+                    "Ref": "Vpc"
+                }
+            },
+            "Type": "AWS::EC2::SecurityGroup"
+        },
+        "InternetGateway": {
+            "Properties": {
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "AWS::StackName"
+                                    },
+                                    "IGW"
+                                ]
+                            ]
+                        }
+                    }
+                ]
+            },
+            "Type": "AWS::EC2::InternetGateway"
+        },
+        "ManagerAsg": {
+            "CreationPolicy": {
+                "ResourceSignal": {
+                    "Count": {
+                        "Ref": "ManagerSize"
+                    },
+                    "Timeout": "PT20M"
+                }
+            },
+            "DependsOn": "SwarmDynDBTable",
+            "Properties": {
+                "DesiredCapacity": {
+                    "Ref": "ManagerSize"
+                },
+                "LaunchConfigurationName": {
+                    "Ref": "ManagerLaunchConfigBeta9"
+                },
+                "LoadBalancerNames": [
+                    {
+                        "Ref": "SSHLoadBalancer"
+                    },
+                    {
+                        "Ref": "ExternalLoadBalancer"
+                    }
+                ],
+                "MaxSize": "5",
+                "MinSize": "0",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "PropagateAtLaunch": "true",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "AWS::StackName"
+                                    },
+                                    "Manager"
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "Key": "swarm-node-type",
+                        "PropagateAtLaunch": "true",
+                        "Value": "manager"
+                    },
+                    {
+                        "Key": "swarm-stack-id",
+                        "PropagateAtLaunch": "true",
+                        "Value": {
+                            "Ref": "AWS::StackId"
+                        }
+                    },
+                    {
+                        "Key": "DOCKER_FOR_AWS_VERSION",
+                        "PropagateAtLaunch": "true",
+                        "Value": {
+                            "Fn::FindInMap": [
+                                "DockerForAWS",
+                                "version",
+                                "forAws"
+                            ]
+                        }
+                    },
+                    {
+                        "Key": "DOCKER_VERSION",
+                        "PropagateAtLaunch": "true",
+                        "Value": {
+                            "Fn::FindInMap": [
+                                "DockerForAWS",
+                                "version",
+                                "docker"
+                            ]
+                        }
+                    }
+                ],
+                "VPCZoneIdentifier": [
+                    {
+                        "Fn::Join": [
+                            ",",
+                            [
+                                {
+                                    "Ref": "PubSubnetAz1"
+                                },
+                                {
+                                    "Ref": "PubSubnetAz2"
+                                }
+                            ]
+                        ]
+                    }
+                ]
+            },
+            "Type": "AWS::AutoScaling::AutoScalingGroup",
+            "UpdatePolicy": {
+                "AutoScalingRollingUpdate": {
+                    "MaxBatchSize": "1",
+                    "MinInstancesInService": "1",
+                    "PauseTime": "PT20M",
+                    "WaitOnResourceSignals": "true"
+                }
+            }
+        },
+        "ManagerLaunchConfigBeta9": {
+            "DependsOn": "ExternalLoadBalancer",
+            "Properties": {
+                "AssociatePublicIpAddress": "true",
+                "IamInstanceProfile": {
+                    "Ref": "ProxyInstanceProfile"
+                },
+                "ImageId": {
+                    "Fn::FindInMap": [
+                        "AWSRegionArch2AMI",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        {
+                            "Fn::FindInMap": [
+                                "AWSInstanceType2Arch",
+                                {
+                                    "Ref": "ManagerInstanceType"
+                                },
+                                "Arch"
+                            ]
+                        }
+                    ]
+                },
+                "InstanceType": {
+                    "Ref": "ManagerInstanceType"
+                },
+                "KeyName": {
+                    "Ref": "KeyName"
+                },
+                "SecurityGroups": [
+                    {
+                        "Ref": "ManagerVpcSG"
+                    },
+                    {
+                        "Ref": "SwarmWideSG"
+                    }
+                ],
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "#!/bin/sh\n",
+                                "echo \"",
+                                {
+                                    "Ref": "ExternalLoadBalancer"
+                                },
+                                "\" > /var/lib/docker/swarm/lb_name\n",
+                                "echo \"# hostname : ELB_name\" >> /var/lib/docker/swarm/elb.config\n",
+                                "echo \"127.0.0.1: ",
+                                {
+                                    "Ref": "ExternalLoadBalancer"
+                                },
+                                "\" >> /var/lib/docker/swarm/elb.config\n",
+                                "echo \"localhost: ",
+                                {
+                                    "Ref": "ExternalLoadBalancer"
+                                },
+                                "\" >> /var/lib/docker/swarm/elb.config\n",
+                                "echo \"default: ",
+                                {
+                                    "Ref": "ExternalLoadBalancer"
+                                },
+                                "\" >> /var/lib/docker/swarm/elb.config\n",
+                                "export DOCKER_FOR_IAAS_VERSION='",
+                                {
+                                    "Fn::FindInMap": [
+                                        "DockerForAWS",
+                                        "version",
+                                        "forAws"
+                                    ]
+                                },
+                                "'\n",
+                                "echo '{\"log-driver\": \"awslogs\",\"log-opts\": {\"awslogs-group\":\"",
+                                {
+                                    "Fn::Join": [
+                                        "-",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "lg"
+                                        ]
+                                    ]
+                                },
+                                "\" }}' > /etc/docker/daemon.json \n",
+                                "chown -R docker /home/docker/\n",
+                                "chgrp -R docker /home/docker/\n",
+                                "rc-service docker restart\n",
+                                "sleep 5\n",
+                                "docker run --log-driver=json-file --restart=no -d ",
+                                "-e DYNAMODB_TABLE='",
+                                {
+                                    "Ref": "SwarmDynDBTable"
+                                },
+                                "' ",
+                                "-e NODE_TYPE='manager' ",
+                                "-e REGION='", 
+                                {
+                                    "Ref": "AWS::Region"
+                                },
+                                "' ",
+                                "-e STACK_NAME='",
+                                {
+                                    "Ref": "AWS::StackName"
+                                },
+                                "' ",
+                                "-e STACK_ID='",
+                                {
+                                    "Ref": "AWS::StackId"
+                                },
+                                "' ",
+                                "-e ACCOUNT_ID='",
+                                {
+                                    "Ref": "AWS::AccountId"
+                                },
+                                "' ",
+                                "-e INSTANCE_NAME='ManagerAsg' ",
+                                "-e DOCKER_FOR_IAAS_VERSION=$DOCKER_FOR_IAAS_VERSION ",
+                                "-v /var/run/docker.sock:/var/run/docker.sock ",
+                                "-v /usr/bin/docker:/usr/bin/docker ",
+                                "-v /var/log:/var/log ",
+                                "docker4x/init-aws:$DOCKER_FOR_IAAS_VERSION\n",
+                                "docker run --log-driver=json-file --name=guide-aws --restart=always -d ",
+                                "-e DYNAMODB_TABLE='",
+                                {
+                                    "Ref": "SwarmDynDBTable"
+                                },
+                                "' ",
+                                "-e NODE_TYPE='manager' ",
+                                "-e REGION='",
+                                {
+                                    "Ref": "AWS::Region"
+                                },
+                                "' ",
+                                "-e STACK_NAME='",
+                                {
+                                    "Ref": "AWS::StackName"
+                                },
+                                "' ",
+                                "-e INSTANCE_NAME='ManagerAsg' ",
+                                "-e VPC_ID='",
+                                {
+                                    "Ref": "Vpc"
+                                },
+                                "' ",
+                                "-e STACK_ID='",
+                                {
+                                    "Ref": "AWS::StackId"
+                                },
+                                "' ",
+                                "-e ACCOUNT_ID='",
+                                {
+                                    "Ref": "AWS::AccountId"
+                                },
+                                "' ",
+                                "-e SWARM_QUEUE='",
+                                {
+                                    "Ref": "SwarmSQS"
+                                },
+                                "' ",
+                                "-e CLEANUP_QUEUE='",
+                                {
+                                    "Ref": "SwarmSQSCleanup"
+                                },
+                                "' ",
+                                "-e DOCKER_FOR_IAAS_VERSION=$DOCKER_FOR_IAAS_VERSION ",
+                                "-v /var/run/docker.sock:/var/run/docker.sock ",
+                                "-v /usr/bin/docker:/usr/bin/docker ",
+                                "docker4x/guide-aws:$DOCKER_FOR_IAAS_VERSION\n",
+                                "docker run --log-driver=json-file --name=shell-aws --restart=always -d -p 22:22 ",
+                                "-v /home/docker/:/home/docker/ ",
+                                "-v /var/run/docker.sock:/var/run/docker.sock ",
+                                "-v /var/lib/docker/swarm/lb_name:/var/lib/docker/swarm/lb_name:ro ",
+                                "-v /var/lib/docker/swarm/elb.config:/var/lib/docker/swarm/elb.config ",
+                                "-v /usr/bin/docker:/usr/bin/docker ",
+                                "-v /var/log:/var/log ",
+                                "-v /etc/passwd:/etc/passwd:ro ",
+                                "-v /etc/shadow:/etc/shadow:ro ",
+                                "-v /etc/group:/etc/group:ro ",
+                                "docker4x/shell-aws:$DOCKER_FOR_IAAS_VERSION\n",
+                                "docker run --log-driver=json-file --name=l4controller-aws --restart=always -d --name=editions_controller ",
+                                "-v /var/run/docker.sock:/var/run/docker.sock ",
+                                "-v /var/lib/docker/swarm:/var/lib/docker/swarm ",
+                                "docker4x/l4controller-aws:$DOCKER_FOR_IAAS_VERSION run --log=4 --all=true\n"
+                            ]
+                        ]
+                    }
+                }
+            },
+            "Type": "AWS::AutoScaling::LaunchConfiguration"
+        },
+        "ManagerVpcSG": {
+            "DependsOn": "NodeVpcSG",
+            "Properties": {
+                "GroupDescription": "Manager SecurityGroup",
+                "SecurityGroupIngress": [
+                    {
+                        "CidrIp": "0.0.0.0/0",
+                        "FromPort": "22",
+                        "IpProtocol": "tcp",
+                        "ToPort": "22"
+                    },
+                    {
+                        "FromPort": "2375",
+                        "IpProtocol": "tcp",
+                        "SourceSecurityGroupId": {
+                            "Fn::GetAtt": [
+                                "NodeVpcSG",
+                                "GroupId"
+                            ]
+                        },
+                        "ToPort": "2375"
+                    },
+                    {
+                        "FromPort": "2377",
+                        "IpProtocol": "tcp",
+                        "SourceSecurityGroupId": {
+                            "Fn::GetAtt": [
+                                "NodeVpcSG",
+                                "GroupId"
+                            ]
+                        },
+                        "ToPort": "2377"
+                    },
+                    {
+                        "FromPort": "4789",
+                        "IpProtocol": "udp",
+                        "SourceSecurityGroupId": {
+                            "Fn::GetAtt": [
+                                "NodeVpcSG",
+                                "GroupId"
+                            ]
+                        },
+                        "ToPort": "4789"
+                    },
+                    {
+                        "FromPort": "7946",
+                        "IpProtocol": "tcp",
+                        "SourceSecurityGroupId": {
+                            "Fn::GetAtt": [
+                                "NodeVpcSG",
+                                "GroupId"
+                            ]
+                        },
+                        "ToPort": "7946"
+                    },
+                    {
+                        "FromPort": "7946",
+                        "IpProtocol": "udp",
+                        "SourceSecurityGroupId": {
+                            "Fn::GetAtt": [
+                                "NodeVpcSG",
+                                "GroupId"
+                            ]
+                        },
+                        "ToPort": "7946"
+                    }
+                ],
+                "VpcId": {
+                    "Ref": "Vpc"
+                }
+            },
+            "Type": "AWS::EC2::SecurityGroup"
+        },
+        "NodeAsg": {
+            "CreationPolicy": {
+                "ResourceSignal": {
+                    "Count": {
+                        "Ref": "ClusterSize"
+                    },
+                    "Timeout": "PT20M"
+                }
+            },
+            "DependsOn": "ManagerAsg",
+            "Properties": {
+                "DesiredCapacity": {
+                    "Ref": "ClusterSize"
+                },
+                "LaunchConfigurationName": {
+                    "Ref": "NodeLaunchConfigBeta9"
+                },
+                "LoadBalancerNames": [
+                    {
+                        "Ref": "ExternalLoadBalancer"
+                    }
+                ],
+                "MaxSize": "1000",
+                "MinSize": "0",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "PropagateAtLaunch": "true",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "AWS::StackName"
+                                    },
+                                    "worker"
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "Key": "swarm-node-type",
+                        "PropagateAtLaunch": "true",
+                        "Value": "worker"
+                    },
+                    {
+                        "Key": "swarm-stack-id",
+                        "PropagateAtLaunch": "true",
+                        "Value": {
+                            "Ref": "AWS::StackId"
+                        }
+                    },
+                    {
+                        "Key": "DOCKER_FOR_AWS_VERSION",
+                        "PropagateAtLaunch": "true",
+                        "Value": {
+                            "Fn::FindInMap": [
+                                "DockerForAWS",
+                                "version",
+                                "forAws"
+                            ]
+                        }
+                    },
+                    {
+                        "Key": "DOCKER_VERSION",
+                        "PropagateAtLaunch": "true",
+                        "Value": {
+                            "Fn::FindInMap": [
+                                "DockerForAWS",
+                                "version",
+                                "docker"
+                            ]
+                        }
+                    }
+                ],
+                "VPCZoneIdentifier": [
+                    {
+                        "Fn::Join": [
+                            ",",
+                            [
+                                {
+                                    "Ref": "PubSubnetAz1"
+                                },
+                                {
+                                    "Ref": "PubSubnetAz2"
+                                }
+                            ]
+                        ]
+                    }
+                ]
+            },
+            "Type": "AWS::AutoScaling::AutoScalingGroup",
+            "UpdatePolicy": {
+                "AutoScalingRollingUpdate": {
+                    "MaxBatchSize": "1",
+                    "MinInstancesInService": "1",
+                    "PauseTime": "PT20M",
+                    "WaitOnResourceSignals": "true"
+                }
+            }
+        },
+        "NodeLaunchConfigBeta9": {
+            "DependsOn": "ManagerAsg",
+            "Properties": {
+                "AssociatePublicIpAddress": "true",
+                "IamInstanceProfile": {
+                    "Ref": "ProxyInstanceProfile"
+                },
+                "ImageId": {
+                    "Fn::FindInMap": [
+                        "AWSRegionArch2AMI",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        {
+                            "Fn::FindInMap": [
+                                "AWSInstanceType2Arch",
+                                {
+                                    "Ref": "InstanceType"
+                                },
+                                "Arch"
+                            ]
+                        }
+                    ]
+                },
+                "InstanceType": {
+                    "Ref": "InstanceType"
+                },
+                "KeyName": {
+                    "Ref": "KeyName"
+                },
+                "SecurityGroups": [
+                    {
+                        "Ref": "NodeVpcSG"
+                    },
+                    {
+                        "Ref": "SwarmWideSG"
+                    }
+                ],
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "#!/bin/sh\n",
+                                "export DOCKER_FOR_IAAS_VERSION='",
+                                {
+                                    "Fn::FindInMap": [
+                                        "DockerForAWS",
+                                        "version",
+                                        "forAws"
+                                    ]
+                                },
+                                "'\n",
+                                "echo '{\"log-driver\": \"awslogs\",\"log-opts\": {\"awslogs-group\":\"",
+                                {
+                                    "Fn::Join": [
+                                        "-",
+                                        [
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "lg"
+                                        ]
+                                    ]
+                                },
+                                "\" }}' > /etc/docker/daemon.json \n",
+                                "chown -R docker /home/docker/\n",
+                                "chgrp -R docker /home/docker/\n",
+                                "rc-service docker restart\n",
+                                "sleep 5\n",
+                                "docker run --log-driver=json-file --restart=no -d ",
+                                "-e DYNAMODB_TABLE='",
+                                {
+                                    "Ref": "SwarmDynDBTable"
+                                },
+                                "' ",
+                                "-e NODE_TYPE='worker' ",
+                                "-e REGION='",
+                                {
+                                    "Ref": "AWS::Region"
+                                },
+                                "' ",
+                                "-e STACK_NAME='",
+                                {
+                                    "Ref": "AWS::StackName"
+                                },
+                                "' ",
+                                "-e STACK_ID='",
+                                {
+                                    "Ref": "AWS::StackId"
+                                },
+                                "' ",
+                                "-e ACCOUNT_ID='",
+                                {
+                                    "Ref": "AWS::AccountId"
+                                },
+                                "' ",
+                                "-e INSTANCE_NAME='NodeAsg' ",
+                                "-e DOCKER_FOR_IAAS_VERSION=$DOCKER_FOR_IAAS_VERSION ",
+                                "-v /var/run/docker.sock:/var/run/docker.sock ",
+                                "-v /usr/bin/docker:/usr/bin/docker ",
+                                "-v /var/log:/var/log ",
+                                "docker4x/init-aws:$DOCKER_FOR_IAAS_VERSION\n",
+                                "docker run --log-driver=json-file --name=guide-aws --restart=always -d ",
+                                "-e DYNAMODB_TABLE='",
+                                {
+                                    "Ref": "SwarmDynDBTable"
+                                },
+                                "' ",
+                                "-e NODE_TYPE='worker' ",
+                                "-e REGION='",
+                                {
+                                    "Ref": "AWS::Region"
+                                },
+                                "' ",
+                                "-e STACK_NAME='",
+                                {
+                                    "Ref": "AWS::StackName"
+                                },
+                                "' ",
+                                "-e INSTANCE_NAME='NodeAsg' ",
+                                "-e VPC_ID='",
+                                {
+                                    "Ref": "Vpc"
+                                },
+                                "' ",
+                                "-e STACK_ID='",
+                                {
+                                    "Ref": "AWS::StackId"
+                                },
+                                "' ",
+                                "-e ACCOUNT_ID='",
+                                {
+                                    "Ref": "AWS::AccountId"
+                                },
+                                "' ",
+                                "-e SWARM_QUEUE='",
+                                {
+                                    "Ref": "SwarmSQS"
+                                },
+                                "' ",
+                                "-e CLEANUP_QUEUE='",
+                                {
+                                    "Ref": "SwarmSQSCleanup"
+                                },
+                                "' ",
+                                "-e DOCKER_FOR_IAAS_VERSION=$DOCKER_FOR_IAAS_VERSION ",
+                                "-v /var/run/docker.sock:/var/run/docker.sock ",
+                                "-v /usr/bin/docker:/usr/bin/docker ",
+                                "docker4x/guide-aws:$DOCKER_FOR_IAAS_VERSION\n"
+                            ]
+                        ]
+                    }
+                }
+            },
+            "Type": "AWS::AutoScaling::LaunchConfiguration"
+        },
+        "NodeVpcSG": {
+            "Properties": {
+                "GroupDescription": "Node SecurityGroup",
+                "SecurityGroupIngress": [
+                    {
+                        "CidrIp": "0.0.0.0/0",
+                        "FromPort": "22",
+                        "IpProtocol": "tcp",
+                        "ToPort": "22"
+                    },
+                    {
+                        "CidrIp": "0.0.0.0/0",
+                        "FromPort": "80",
+                        "IpProtocol": "tcp",
+                        "ToPort": "80"
+                    }
+                ],
+                "VpcId": {
+                    "Ref": "Vpc"
+                }
+            },
+            "Type": "AWS::EC2::SecurityGroup"
+        },
+        "ProxyInstanceProfile": {
+            "Properties": {
+                "Path": "/",
+                "Roles": [
+                    {
+                        "Ref": "ProxyRole"
+                    }
+                ]
+            },
+            "Type": "AWS::IAM::InstanceProfile"
+        },
+        "ProxyPolicies": {
+            "Properties": {
+                "PolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": "elasticloadbalancing:*",
+                            "Effect": "Allow",
+                            "Resource": "*"
+                        }
+                    ],
+                    "Version": "2012-10-17"
+                },
+                "PolicyName": "elb-update",
+                "Roles": [
+                    {
+                        "Ref": "ProxyRole"
+                    }
+                ]
+            },
+            "Type": "AWS::IAM::Policy"
+        },
+        "ProxyRole": {
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": [
+                                "sts:AssumeRole"
+                            ],
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "ec2.amazonaws.com",
+                                    "autoscaling.amazonaws.com"
+                                ]
+                            }
+                        }
+                    ],
+                    "Version": "2012-10-17"
+                },
+                "Path": "/"
+            },
+            "Type": "AWS::IAM::Role"
+        },
+        "PubSubnet1RouteTableAssociation": {
+            "Properties": {
+                "RouteTableId": {
+                    "Ref": "RouteViaIgw"
+                },
+                "SubnetId": {
+                    "Ref": "PubSubnetAz1"
+                }
+            },
+            "Type": "AWS::EC2::SubnetRouteTableAssociation"
+        },
+        "PubSubnet2RouteTableAssociation": {
+            "Properties": {
+                "RouteTableId": {
+                    "Ref": "RouteViaIgw"
+                },
+                "SubnetId": {
+                    "Ref": "PubSubnetAz2"
+                }
+            },
+            "Type": "AWS::EC2::SubnetRouteTableAssociation"
+        },
+        "PubSubnetAz1": {
+            "Properties": {
+                "AvailabilityZone": {
+                    "Fn::Select": [
+                        "0",
+                        {
+                            "Fn::GetAZs": {
+                                "Ref": "AWS::Region"
+                            }
+                        }
+                    ]
+                },
+                "CidrBlock": {
+                    "Fn::FindInMap": [
+                        "VpcCidrs",
+                        "pubsubnet1",
+                        "cidr"
+                    ]
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "AWS::StackName"
+                                    },
+                                    "Subnet1"
+                                ]
+                            ]
+                        }
+                    }
+                ],
+                "VpcId": {
+                    "Ref": "Vpc"
+                }
+            },
+            "Type": "AWS::EC2::Subnet"
+        },
+        "PubSubnetAz2": {
+            "Properties": {
+                "AvailabilityZone": {
+                    "Fn::Select": [
+                        "1",
+                        {
+                            "Fn::GetAZs": {
+                                "Ref": "AWS::Region"
+                            }
+                        }
+                    ]
+                },
+                "CidrBlock": {
+                    "Fn::FindInMap": [
+                        "VpcCidrs",
+                        "pubsubnet2",
+                        "cidr"
+                    ]
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "AWS::StackName"
+                                    },
+                                    "Subnet2"
+                                ]
+                            ]
+                        }
+                    }
+                ],
+                "VpcId": {
+                    "Ref": "Vpc"
+                }
+            },
+            "Type": "AWS::EC2::Subnet"
+        },
+        "PublicRouteViaIgw": {
+            "Properties": {
+                "DestinationCidrBlock": "0.0.0.0/0",
+                "GatewayId": {
+                    "Ref": "InternetGateway"
+                },
+                "RouteTableId": {
+                    "Ref": "RouteViaIgw"
+                }
+            },
+            "Type": "AWS::EC2::Route"
+        },
+        "RouteViaIgw": {
+            "Properties": {
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "AWS::StackName"
+                                    },
+                                    "RT"
+                                ]
+                            ]
+                        }
+                    }
+                ],
+                "VpcId": {
+                    "Ref": "Vpc"
+                }
+            },
+            "Type": "AWS::EC2::RouteTable"
+        },
+        "SSHLoadBalancer": {
+            "DependsOn": "AttachGateway",
+            "Properties": {
+                "ConnectionSettings": {
+                    "IdleTimeout": "1800"
+                },
+                "CrossZone": "true",
+                "HealthCheck": {
+                    "HealthyThreshold": "2",
+                    "Interval": "10",
+                    "Target": "TCP:22",
+                    "Timeout": "2",
+                    "UnhealthyThreshold": "4"
+                },
+                "Listeners": [
+                    {
+                        "InstancePort": "22",
+                        "LoadBalancerPort": "22",
+                        "Protocol": "TCP"
+                    }
+                ],
+                "LoadBalancerName": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            {
+                                "Ref": "AWS::StackName"
+                            },
+                            "ELB-SSH"
+                        ]
+                    ]
+                },
+                "SecurityGroups": [
+                    {
+                        "Ref": "SSHLoadBalancerSG"
+                    }
+                ],
+                "Subnets": [
+                    {
+                        "Ref": "PubSubnetAz1"
+                    },
+                    {
+                        "Ref": "PubSubnetAz2"
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "AWS::StackName"
+                                    },
+                                    "ELB-SSH"
+                                ]
+                            ]
+                        }
+                    }
+                ]
+            },
+            "Type": "AWS::ElasticLoadBalancing::LoadBalancer"
+        },
+        "SSHLoadBalancerSG": {
+            "Properties": {
+                "GroupDescription": "SSH Load Balancer SecurityGroup",
+                "SecurityGroupIngress": [
+                    {
+                        "CidrIp": "0.0.0.0/0",
+                        "FromPort": "22",
+                        "IpProtocol": "-1",
+                        "ToPort": "22"
+                    }
+                ],
+                "VpcId": {
+                    "Ref": "Vpc"
+                }
+            },
+            "Type": "AWS::EC2::SecurityGroup"
+        },
+        "SwarmAPIPolicy": {
+            "Properties": {
+                "PolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": [
+                                "ec2:DescribeInstances",
+                                "ec2:DescribeVpcAttribute",
+                                "logs:CreateLogStream",
+                                "logs:PutLogEvents"
+                            ],
+                            "Effect": "Allow",
+                            "Resource": "*"
+                        }
+                    ],
+                    "Version": "2012-10-17"
+                },
+                "PolicyName": "swarm-policy",
+                "Roles": [
+                    {
+                        "Ref": "ProxyRole"
+                    }
+                ]
+            },
+            "Type": "AWS::IAM::Policy"
+        },
+        "SwarmAutoscalePolicy": {
+            "Properties": {
+                "PolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": "autoscaling:*",
+                            "Effect": "Allow",
+                            "Resource": "*"
+                        }
+                    ],
+                    "Version": "2012-10-17"
+                },
+                "PolicyName": "swarm-autoscale-policy",
+                "Roles": [
+                    {
+                        "Ref": "ProxyRole"
+                    }
+                ]
+            },
+            "Type": "AWS::IAM::Policy"
+        },
+        "SwarmDynDBTable": {
+            "DependsOn": "ExternalLoadBalancer",
+            "Properties": {
+                "AttributeDefinitions": [
+                    {
+                        "AttributeName": "node_type",
+                        "AttributeType": "S"
+                    }
+                ],
+                "KeySchema": [
+                    {
+                        "AttributeName": "node_type",
+                        "KeyType": "HASH"
+                    }
+                ],
+                "ProvisionedThroughput": {
+                    "ReadCapacityUnits": 1,
+                    "WriteCapacityUnits": 1
+                },
+                "TableName": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            {
+                                "Ref": "AWS::StackName"
+                            },
+                            "dyndbtable"
+                        ]
+                    ]
+                }
+            },
+            "Type": "AWS::DynamoDB::Table"
+        },
+        "SwarmManagerUpgradeHook": {
+            "DependsOn": "SwarmSQS",
+            "Properties": {
+                "AutoScalingGroupName": {
+                    "Ref": "ManagerAsg"
+                },
+                "LifecycleTransition": "autoscaling:EC2_INSTANCE_TERMINATING",
+                "NotificationTargetARN": {
+                    "Fn::GetAtt": [
+                        "SwarmSQS",
+                        "Arn"
+                    ]
+                },
+                "RoleARN": {
+                    "Fn::GetAtt": [
+                        "ProxyRole",
+                        "Arn"
+                    ]
+                }
+            },
+            "Type": "AWS::AutoScaling::LifecycleHook"
+        },
+        "SwarmSQS": {
+            "Properties": {
+                "MessageRetentionPeriod": 43200,
+                "ReceiveMessageWaitTimeSeconds": 10
+            },
+            "Type": "AWS::SQS::Queue"
+        },
+        "SwarmSQSCleanup": {
+            "Properties": {
+                "MessageRetentionPeriod": 43200,
+                "ReceiveMessageWaitTimeSeconds": 10
+            },
+            "Type": "AWS::SQS::Queue"
+        },
+        "SwarmSQSCleanupPolicy": {
+            "Properties": {
+                "PolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": "sqs:*",
+                            "Effect": "Allow",
+                            "Resource": {
+                                "Fn::GetAtt": [
+                                    "SwarmSQSCleanup",
+                                    "Arn"
+                                ]
+                            }
+                        }
+                    ],
+                    "Version": "2012-10-17"
+                },
+                "PolicyName": "swarm-sqs-cleanup-policy",
+                "Roles": [
+                    {
+                        "Ref": "ProxyRole"
+                    }
+                ]
+            },
+            "Type": "AWS::IAM::Policy"
+        },
+        "SwarmSQSPolicy": {
+            "Properties": {
+                "PolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": "sqs:*",
+                            "Effect": "Allow",
+                            "Resource": {
+                                "Fn::GetAtt": [
+                                    "SwarmSQS",
+                                    "Arn"
+                                ]
+                            }
+                        }
+                    ],
+                    "Version": "2012-10-17"
+                },
+                "PolicyName": "swarm-sqs-policy",
+                "Roles": [
+                    {
+                        "Ref": "ProxyRole"
+                    }
+                ]
+            },
+            "Type": "AWS::IAM::Policy"
+        },
+        "SwarmWideSG": {
+            "DependsOn": "NodeVpcSG",
+            "Properties": {
+                "GroupDescription": "Wide open",
+                "SecurityGroupIngress": [
+                    {
+                        "CidrIp": {
+                            "Fn::FindInMap": [
+                                "VpcCidrs",
+                                "vpc",
+                                "cidr"
+                            ]
+                        },
+                        "FromPort": "0",
+                        "IpProtocol": "-1",
+                        "ToPort": "65535"
+                    }
+                ],
+                "VpcId": {
+                    "Ref": "Vpc"
+                }
+            },
+            "Type": "AWS::EC2::SecurityGroup"
+        },
+        "SwarmWorkerUpgradeHook": {
+            "DependsOn": "SwarmSQS",
+            "Properties": {
+                "AutoScalingGroupName": {
+                    "Ref": "NodeAsg"
+                },
+                "LifecycleTransition": "autoscaling:EC2_INSTANCE_TERMINATING",
+                "NotificationTargetARN": {
+                    "Fn::GetAtt": [
+                        "SwarmSQS",
+                        "Arn"
+                    ]
+                },
+                "RoleARN": {
+                    "Fn::GetAtt": [
+                        "ProxyRole",
+                        "Arn"
+                    ]
+                }
+            },
+            "Type": "AWS::AutoScaling::LifecycleHook"
+        },
+        "Vpc": {
+            "Properties": {
+                "CidrBlock": {
+                    "Fn::FindInMap": [
+                        "VpcCidrs",
+                        "vpc",
+                        "cidr"
+                    ]
+                },
+                "EnableDnsHostnames": "true",
+                "EnableDnsSupport": "true",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "AWS::StackName"
+                                    },
+                                    "VPC"
+                                ]
+                            ]
+                        }
+                    }
+                ]
+            },
+            "Type": "AWS::EC2::VPC"
+        }
+    }
+}

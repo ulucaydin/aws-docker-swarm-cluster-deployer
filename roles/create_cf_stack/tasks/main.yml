@@ -9,6 +9,7 @@
 - set_fact:
     master_cloud_config: "{{ lookup('template', '../templates/master-config-file.yml.j2') | replace('\r\n', '\\n') }}"
     minion_cloud_config: "{{ lookup('template', '../templates/minion-config-file.yml.j2') | replace('\r\n', '\\n') }}"
+    storage_cloud_config: "{{ lookup('template', '../templates/storage-config-file.yml.j2') | replace('\r\n', '\\n') }}"
 
 - set_fact:
     cf_template: "{{ lookup('template', 'coreos-beta-swarm-hvm.template') }}"
@@ -24,13 +25,17 @@
     aws_secret_key: "{{ aws_secret_key }}"
     template: "cf_template"
     region: "{{ cf_region }}"
+    disable_rollback: "{{ cf_disable_rollback }}"
     template_parameters:
+      EBSVolumeSize: "{{ cf_ebs_size }}"
       InstanceType: "{{ cf_instance_type }}"
       NodeClusterSize: "{{ cf_node_cluster_size }}"
       MasterClusterSize: "{{ cf_master_cluster_size }}"
       KeyName: "{{ aws_keypair }}"
       DiscoveryURL: "{{ discovery_service_url.content }}"
       VpcAvailabilityZones: "{{ cf_vpc_azs }}"
+      AllowSSHFrom: "{{ ip_address }}"
+      NodeHTTPCertARN: "{{ certificate_arn }}"
     tags:
       Stack: "ansible-cloudformation"
   register: stack_creation_response
