@@ -11,7 +11,7 @@
             [Service]
             Restart=on-failure
             RestartSec=10
-            Environment=\"DOCKER_OPTS=--cluster-store=etcd://localhost:2379 --cluster-advertise=${{ advertised_ip_address }}_ipv4:4243\"
+            Environment=\"DOCKER_OPTS=--cluster-store=etcd://localhost:2379 --cluster-advertise=private_ipv4:4243\"
     - name: docker-swarm.service
       command: start
       content: |

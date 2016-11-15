@@ -22,7 +22,7 @@
         ExecStartPre=-/usr/bin/docker kill docker-swarm
         ExecStartPre=-/usr/bin/docker rm docker-swarm
         ExecStartPre=/usr/bin/docker pull swarm
-        ExecStart=/usr/bin/docker run --restart=on-failure --name docker-swarm -d swarm --experimental join --addr=${{ advertised_ip_address }}_ipv4:4243 etcd://", { "Fn::GetAtt" : [ "MasterLoadBalancer", "DNSName" ] }, ":2379/swarm
+        ExecStart=/usr/bin/docker run --restart=on-failure --name docker-swarm -d swarm --experimental join --addr=private_ipv4:4243 etcd://", { "Fn::GetAtt" : [ "MasterLoadBalancer", "DNSName" ] }, ":2379/swarm
 
     - name: ecr-credential-helper.service
       command: start

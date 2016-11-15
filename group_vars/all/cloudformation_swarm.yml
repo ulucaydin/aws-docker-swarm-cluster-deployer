@@ -4,9 +4,5 @@ cf_region: us-east-1
 cf_node_cluster_size: 5
 cf_master_cluster_size: 3
 cf_vpc_azs: "{{ cf_region }}a,{{ cf_region }}c,{{ cf_region }}d"
-ip_address: "97.107.48.95/32"
 cf_disable_rollback: false
 cf_ebs_size: 50
-certificate_arn: "arn:aws:iam::151743893450:server-certificate/test-cert-wildcard"
-
-advertised_ip_address: private
