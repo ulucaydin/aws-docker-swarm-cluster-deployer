@@ -83,6 +83,10 @@
       "MinValue" : "10",
       "MaxValue" : "100",
       "Default": "50"
+    },
+    "NodeHTTPCertARN" : {
+      "Description" : "APllication Loadbalance Certificate ARN",
+      "Type": "String"
     }
   },
 
@@ -504,6 +508,23 @@
         "LoadBalancerArn": { "Ref": "NodeHTTPLoadBalancer" },
         "Port": "80",
         "Protocol": "HTTP"
+      }
+    },
+
+    "NodeLoadBalancerHTTPSListener": {
+      "Type": "AWS::ElasticLoadBalancingV2::Listener",
+      "DependsOn" : ["NodeHTTPLoadBalancer", "NodeHTTPTargetGroup"],
+      "Properties": {
+        "Certificates" : [{ 
+          "CertificateArn": { "Ref": "NodeHTTPCertARN" }
+        }],
+        "DefaultActions": [{
+          "Type": "forward",
+          "TargetGroupArn": { "Ref": "NodeHTTPTargetGroup" }
+        }],
+        "LoadBalancerArn": { "Ref": "NodeHTTPLoadBalancer" },
+        "Port": "443",
+        "Protocol": "HTTPS"
       }
     },
 
