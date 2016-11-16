@@ -332,6 +332,11 @@
           "CidrIp" : "0.0.0.0/0"
         },{
           "IpProtocol" : "tcp",
+          "FromPort" : "123",
+          "ToPort" : "123",
+          "CidrIp" : "0.0.0.0/0"
+        },{
+          "IpProtocol" : "tcp",
           "FromPort" : "2379",
           "ToPort" : "2379",
           "CidrIp" : "0.0.0.0/0"
@@ -399,6 +404,7 @@
         "VpcId" : { "Ref" : "Vpc" },
         "SecurityGroupIngress" : [
           { "IpProtocol" : "tcp", "FromPort" : "0", "ToPort" : "65535", "CidrIp": "10.203.0.0/16" },
+          { "IpProtocol" : "udp", "FromPort" : "0", "ToPort" : "65535", "CidrIp": "10.203.0.0/16" },
           { "IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : { "Ref" : "AllowSSHFrom" } },
           { "IpProtocol" : "tcp", "FromPort" : "4000", "ToPort" : "4000", "CidrIp" : "0.0.0.0/0" }
         ],
@@ -439,6 +445,7 @@
         "VpcId" : { "Ref" : "Vpc" },
         "SecurityGroupIngress" : [
           { "IpProtocol" : "tcp", "FromPort" : "0", "ToPort" : "65535", "CidrIp": "10.203.0.0/16" },
+          { "IpProtocol" : "udp", "FromPort" : "0", "ToPort" : "65535", "CidrIp": "10.203.0.0/16" },
           { "IpProtocol" : "tcp", "FromPort" : "4000", "ToPort" : "4000", "CidrIp": { "Ref" : "AllowSSHFrom" } },
           { "IpProtocol" : "tcp", "FromPort" : "2379", "ToPort" : "2379", "CidrIp" : "0.0.0.0/0" }
         ],
@@ -487,8 +494,10 @@
     "NodeHTTPTargetGroup" : {
       "Type" : "AWS::ElasticLoadBalancingV2::TargetGroup",
       "Properties" : {
-        "HealthCheckIntervalSeconds" : 60,
-        "UnhealthyThresholdCount" : 10,
+        "HealthCheckIntervalSeconds" : 10,
+        "HealthCheckTimeoutSeconds" : 5,
+        "UnhealthyThresholdCount" : 2,
+        "HealthyThresholdCount" : 2,
         "HealthCheckPath" : "/health",
         "Name" : {"Fn::Join" : ["-", ["swarm-nodes-http", { "Ref" : "Vpc" } ]]},
         "Port" : 80,
@@ -515,7 +524,7 @@
       "Type": "AWS::ElasticLoadBalancingV2::Listener",
       "DependsOn" : ["NodeHTTPLoadBalancer", "NodeHTTPTargetGroup"],
       "Properties": {
-        "Certificates" : [{ 
+        "Certificates" : [{
           "CertificateArn": { "Ref": "NodeHTTPCertARN" }
         }],
         "DefaultActions": [{
