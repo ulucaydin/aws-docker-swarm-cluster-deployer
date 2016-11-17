@@ -395,6 +395,7 @@
         "VpcId" : { "Ref" : "Vpc" },
         "SecurityGroupIngress" : [
           { "IpProtocol" : "tcp", "FromPort" : "0", "ToPort" : "65535", "CidrIp": "10.203.0.0/16" },
+          { "IpProtocol" : "udp", "FromPort" : "0", "ToPort" : "65535", "CidrIp": "10.203.0.0/16" },
           { "IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : { "Ref" : "AllowSSHFrom" } },
           { "IpProtocol" : "tcp", "FromPort" : "4000", "ToPort" : "4000", "CidrIp" : "0.0.0.0/0" }
         ],
@@ -435,6 +436,7 @@
         "VpcId" : { "Ref" : "Vpc" },
         "SecurityGroupIngress" : [
           { "IpProtocol" : "tcp", "FromPort" : "0", "ToPort" : "65535", "CidrIp": "10.203.0.0/16" },
+          { "IpProtocol" : "udp", "FromPort" : "0", "ToPort" : "65535", "CidrIp": "10.203.0.0/16" },
           { "IpProtocol" : "tcp", "FromPort" : "4000", "ToPort" : "4000", "CidrIp": { "Ref" : "AllowSSHFrom" } },
           { "IpProtocol" : "tcp", "FromPort" : "2379", "ToPort" : "2379", "CidrIp" : "0.0.0.0/0" }
         ],
@@ -554,8 +556,8 @@
           "Target" : { "Fn::Join" : [ "", ["HTTP:2379", "/health"]]},
           "HealthyThreshold" : "2",
           "UnhealthyThreshold" : "4",
-          "Interval" : "30",
-          "Timeout" : "7"
+          "Interval" : "10",
+          "Timeout" : "4"
         }
       }
     },
