@@ -83,6 +83,10 @@
       "MinValue" : "10",
       "MaxValue" : "100",
       "Default": "50"
+    },
+    "NodeHTTPCertARN" : {
+      "Description" : "APllication Loadbalance Certificate ARN",
+      "Type": "String"
     }
   },
 
@@ -333,6 +337,11 @@
           "CidrIp" : "0.0.0.0/0"
         },{
           "IpProtocol" : "tcp",
+          "FromPort" : "123",
+          "ToPort" : "123",
+          "CidrIp" : "0.0.0.0/0"
+        },{
+          "IpProtocol" : "tcp",
           "FromPort" : "2379",
           "ToPort" : "2379",
           "CidrIp" : "0.0.0.0/0"
@@ -503,8 +512,10 @@
     "NodeHTTPTargetGroup" : {
       "Type" : "AWS::ElasticLoadBalancingV2::TargetGroup",
       "Properties" : {
-        "HealthCheckIntervalSeconds" : 60,
-        "UnhealthyThresholdCount" : 10,
+        "HealthCheckIntervalSeconds" : 10,
+        "HealthCheckTimeoutSeconds" : 5,
+        "UnhealthyThresholdCount" : 2,
+        "HealthyThresholdCount" : 2,
         "HealthCheckPath" : "/health",
         "Name" : {"Fn::Join" : ["-", ["swarm-nodes-http", { "Ref" : "Vpc" } ]]},
         "Port" : 80,
@@ -524,6 +535,23 @@
         "LoadBalancerArn": { "Ref": "NodeHTTPLoadBalancer" },
         "Port": "80",
         "Protocol": "HTTP"
+      }
+    },
+
+    "NodeLoadBalancerHTTPSListener": {
+      "Type": "AWS::ElasticLoadBalancingV2::Listener",
+      "DependsOn" : ["NodeHTTPLoadBalancer", "NodeHTTPTargetGroup"],
+      "Properties": {
+        "Certificates" : [{
+          "CertificateArn": { "Ref": "NodeHTTPCertARN" }
+        }],
+        "DefaultActions": [{
+          "Type": "forward",
+          "TargetGroupArn": { "Ref": "NodeHTTPTargetGroup" }
+        }],
+        "LoadBalancerArn": { "Ref": "NodeHTTPLoadBalancer" },
+        "Port": "443",
+        "Protocol": "HTTPS"
       }
     },
 
