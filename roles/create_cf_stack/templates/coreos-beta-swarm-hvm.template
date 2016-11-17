@@ -323,6 +323,11 @@
           "CidrIp" : "0.0.0.0/0"
         },{
           "IpProtocol" : "tcp",
+          "FromPort" : "123",
+          "ToPort" : "123",
+          "CidrIp" : "0.0.0.0/0"
+        },{
+          "IpProtocol" : "tcp",
           "FromPort" : "3389",
           "ToPort" : "3389",
           "CidrIp" : "0.0.0.0/0"
@@ -429,7 +434,22 @@
       }
     },
 
-    "MasterLoadBalancerSecurityGroup" : {
+    "ExternalMasterLoadBalancerSecurityGroup" : {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "GroupDescription" : "Enable communication with Swarm Masters and Etcd",
+        "VpcId" : { "Ref" : "Vpc" },
+        "SecurityGroupIngress" : [
+          { "IpProtocol" : "tcp", "FromPort" : "1", "ToPort" : "65535", "CidrIp": { "Ref" : "AllowSSHFrom" } },
+        ],
+        "SecurityGroupEgress" :  [
+          { "IpProtocol" : "tcp", "FromPort" : "1", "ToPort" : "65535", "CidrIp" : "0.0.0.0/0" },
+          { "IpProtocol" : "udp", "FromPort" : "1", "ToPort" : "65535", "CidrIp" : "0.0.0.0/0" }
+        ]
+      }
+    },
+
+    "InternalMasterLoadBalancerSecurityGroup" : {
       "Type" : "AWS::EC2::SecurityGroup",
       "Properties" : {
         "GroupDescription" : "Enable communication with Swarm Masters and Etcd",
@@ -437,8 +457,6 @@
         "SecurityGroupIngress" : [
           { "IpProtocol" : "tcp", "FromPort" : "0", "ToPort" : "65535", "CidrIp": "10.203.0.0/16" },
           { "IpProtocol" : "udp", "FromPort" : "0", "ToPort" : "65535", "CidrIp": "10.203.0.0/16" },
-          { "IpProtocol" : "tcp", "FromPort" : "4000", "ToPort" : "4000", "CidrIp": { "Ref" : "AllowSSHFrom" } },
-          { "IpProtocol" : "tcp", "FromPort" : "2379", "ToPort" : "2379", "CidrIp" : "0.0.0.0/0" }
         ],
         "SecurityGroupEgress" :  [
           { "IpProtocol" : "tcp", "FromPort" : "1", "ToPort" : "65535", "CidrIp" : "0.0.0.0/0" },
@@ -532,13 +550,44 @@
       }
     },
 
-    "MasterLoadBalancer" : {
+    "ExternalMasterLoadBalancer" : {
       "Type" : "AWS::ElasticLoadBalancing::LoadBalancer",
-      "DependsOn" : [ "PubSubnetAz1", "PubSubnetAz2", "PubSubnetAz3", "MasterLoadBalancerSecurityGroup"],
+      "DependsOn" : [ "PubSubnetAz1", "PubSubnetAz2", "PubSubnetAz3", "ExternalMasterLoadBalancerSecurityGroup"],
       "Properties" : {
-        "LoadBalancerName" : {"Fn::Join" : ["-", ["master", { "Ref" : "Vpc" } ]]},
+        "LoadBalancerName" : {"Fn::Join" : ["-", ["external-master", { "Ref" : "Vpc" } ]]},
         "CrossZone": true,
-        "SecurityGroups" : [ { "Ref" : "MasterLoadBalancerSecurityGroup" } ],
+        "SecurityGroups" : [ { "Ref" : "ExternalMasterLoadBalancerSecurityGroup" } ],
+        "Subnets" : [{ "Ref" : "PubSubnetAz1" }, { "Ref" : "PubSubnetAz2" }, { "Ref" : "PubSubnetAz3" }],
+        "Listeners" :
+          [ {
+            "LoadBalancerPort" : "2379",
+            "InstancePort" : "2379",
+            "Protocol" : "TCP"
+          },
+          {
+            "LoadBalancerPort" : "4000",
+            "InstancePort" : "4000",
+            "Protocol" : "TCP"
+          }
+        ],
+        "HealthCheck" : {
+          "Target" : { "Fn::Join" : [ "", ["HTTP:2379", "/health"]]},
+          "HealthyThreshold" : "2",
+          "UnhealthyThreshold" : "4",
+          "Interval" : "10",
+          "Timeout" : "4"
+        }
+      }
+    },
+
+    "InternalMasterLoadBalancer" : {
+      "Type" : "AWS::ElasticLoadBalancing::LoadBalancer",
+      "DependsOn" : [ "PubSubnetAz1", "PubSubnetAz2", "PubSubnetAz3", "InternalMasterLoadBalancerSecurityGroup"],
+      "Properties" : {
+        "Scheme" : "internal",
+        "LoadBalancerName" : {"Fn::Join" : ["-", ["internal-master", { "Ref" : "Vpc" } ]]},
+        "CrossZone": true,
+        "SecurityGroups" : [ { "Ref" : "InternalMasterLoadBalancerSecurityGroup" } ],
         "Subnets" : [{ "Ref" : "PubSubnetAz1" }, { "Ref" : "PubSubnetAz2" }, { "Ref" : "PubSubnetAz3" }],
         "Listeners" :
           [ {
@@ -599,7 +648,7 @@
           [ { "Fn::Select" : [ "0", { "Ref" : "VpcAvailabilityZones" } ] }, { "Fn::Select" : [ "1", { "Ref" : "VpcAvailabilityZones" } ] }, { "Fn::Select" : [ "2", { "Ref" : "VpcAvailabilityZones" } ] } ],
         "VPCZoneIdentifier" : [ { "Fn::Join" : [",", [ { "Ref" : "PrivateSubnetAz1" }, { "Ref" : "PrivateSubnetAz2" }, { "Ref" : "PrivateSubnetAz3" } ] ] } ],
         "LaunchConfigurationName" : { "Ref" : "MasterLaunchConfiguration" },
-        "LoadBalancerNames" : [ { "Ref" : "MasterLoadBalancer" } ],
+        "LoadBalancerNames" : [ { "Ref" : "InternalMasterLoadBalancer" }, { "Ref" : "ExternalMasterLoadBalancer" } ],
         "MinSize" : "4",
         "MaxSize" : "12",
         "DesiredCapacity" : "4",
@@ -723,7 +772,7 @@
 
     "MasterDocker" : {
       "Description" : "'docker' ELB for the cluster master",
-      "Value" : { "Fn::Join" : [ "", [ "tcp://", { "Fn::GetAtt" : [ "MasterLoadBalancer", "DNSName" ] }, ":4000" ] ] }
+      "Value" : { "Fn::Join" : [ "", [ "tcp://", { "Fn::GetAtt" : [ "ExternalMasterLoadBalancer", "DNSName" ] }, ":4000" ] ] }
     },
     "NodeHTTPLoadBalancer" : {
       "Description" : "Node HTTP load balancer",
