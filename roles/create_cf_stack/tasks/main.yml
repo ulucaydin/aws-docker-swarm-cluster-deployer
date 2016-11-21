@@ -1,5 +1,9 @@
 ---
 
+- name: Generate the ssh key using the AWS CLI
+  script: files/generate_key.sh -r {{ cf_region }} -n {{ cf_stack_name }}
+  ignore_errors: yes
+
 - name: Get a new Discovery Service url
   uri:
     url: "https://discovery.etcd.io/new?size={{ cf_master_cluster_size }}"
@@ -31,7 +35,7 @@
       InstanceType: "{{ cf_instance_type }}"
       NodeClusterSize: "{{ cf_node_cluster_size }}"
       MasterClusterSize: "{{ cf_master_cluster_size }}"
-      KeyName: "{{ aws_keypair }}"
+      KeyName: "{{ cf_stack_name }}"
       DiscoveryURL: "{{ discovery_service_url.content }}"
       VpcAvailabilityZones: "{{ cf_vpc_azs }}"
       AllowSSHFrom: "{{ ip_address }}"
@@ -39,6 +43,11 @@
     tags:
       Stack: "ansible-cloudformation"
   register: stack_creation_response
+
+- name: Output the master ELB DNS to a file
+  template:
+    src: master-elb.j2
+    dest: ./master-elb
 
 - name: Stack Output
   debug: msg="{{ stack_creation_response.stack_outputs }}"

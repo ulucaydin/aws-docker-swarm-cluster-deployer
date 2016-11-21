@@ -36,7 +36,7 @@ If a Stack already exist with the given stack name, it will update. Otherwise cr
 
 5. Create the CloudFront Stack using Ansible
 ``` shell
-ansible-playbook aws_create_swarm_cluster.yml  --extra-vars "cf_stack_name=<clusters name>"
+make create_docker_swarm"
 ```
 6. Once the Stack creation is complete, Ansible will out provide the output of Swarm Master as related information and swarm node http load balancer
 
