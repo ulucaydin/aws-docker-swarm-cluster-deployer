@@ -2,6 +2,7 @@
 
 - name: Generate the ssh key using the AWS CLI
   script: files/generate_key.sh -r {{ cf_region }} -n {{ cf_stack_name }}
+  ignore_errors: yes
 
 - name: Get a new Discovery Service url
   uri:
@@ -42,6 +43,11 @@
     tags:
       Stack: "ansible-cloudformation"
   register: stack_creation_response
+
+- name: Output the master ELB DNS to a file
+  template:
+    src: master-elb.j2
+    dest: ./master-elb
 
 - name: Stack Output
   debug: msg="{{ stack_creation_response.stack_outputs }}"
