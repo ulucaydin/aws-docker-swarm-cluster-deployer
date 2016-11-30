@@ -1,7 +1,19 @@
 {% include 'cloud-init-common.yml.j2' %}
 
     - name: etcd2.service
+      command: stop
+    - name: etcd-peers.service
       command: start
+      content: |
+        [Unit]
+        Description=Write a file with the etcd peers that we should bootstrap to
+        [Service]
+        Restart=on-failure
+        RestartSec=10
+        ExecStartPre=/usr/bin/docker pull monsantoco/etcd-aws-cluster:latest
+        ExecStartPre=/usr/bin/docker run --rm=true -v /etc/sysconfig/:/etc/sysconfig/ monsantoco/etcd-aws-cluster:latest
+        ExecStart=/usr/bin/systemctl start etcd2
+
     - name: fleet.service
       command: start
     - name: docker.service
