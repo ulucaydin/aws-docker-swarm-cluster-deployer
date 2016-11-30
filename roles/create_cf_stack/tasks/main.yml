@@ -1,7 +1,7 @@
 ---
 
 - name: Generate the ssh key using the AWS CLI
-  script: files/generate_key.sh -r {{ cf_region }} -n {{ cf_stack_name }}
+  script: files/generate_key.sh -r {{ cf_region }} -n {{ cf_stack_name }} -k "{{ aws_access_key }}" -s "{{ aws_secret_key }}"
   ignore_errors: yes
 
 - name: Get a new Discovery Service url
