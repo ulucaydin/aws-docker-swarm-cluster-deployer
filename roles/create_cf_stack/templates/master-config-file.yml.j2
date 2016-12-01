@@ -1,4 +1,54 @@
-{% include 'cloud-init-common.yml.j2' %}
+#cloud-config
+
+write_files:
+  - path: /home/core/.docker/config.json
+    owner: 'core:core'
+    permissions: '0600'
+    content: |
+        {\"credsStore\": \"ecr-login\"}
+  - path: /etc/profile.d/aws_credential.sh
+    content: |
+      export AWS_ACCESS_KEY_ID={{ aws_access_key }}
+      export AWS_SECRET_ACCESS_KEY={{ aws_secret_key }}
+  - path: /etc/systemd/system/docker.service.d/increase-ulimit.conf
+    owner: core:core
+    permissions: 0644
+    content: |
+      [Service]
+      LimitMEMLOCK=infinity
+      LimitNOFILE=infinity
+
+  - path: /etc/systemd/system/etcd2.service.d/30-etcd_peers.conf
+    permissions: 0644
+    content: |
+      [Service]
+      EnvironmentFile=/etc/sysconfig/etcd-peers 
+
+coreos:
+  etcd2:
+    advertise-client-urls: http://$private_ipv4:2379
+    initial-advertise-peer-urls: http://$private_ipv4:2380
+    listen-client-urls: http://0.0.0.0:2379
+    listen-peer-urls: http://$private_ipv4:2380
+    heartbeat-interval: 600
+    election-timeout: 6000
+
+  units:
+    - name: docker-tcp.socket
+      command: start
+      enable: true
+      content: |
+        [Unit]
+        Description=Docker Socket for the API
+
+        [Socket]
+        ListenStream=4243
+        BindIPv6Only=both
+        Service=docker.service
+
+        [Install]
+        WantedBy=sockets.target
+
 
     - name: etcd2.service
       command: stop

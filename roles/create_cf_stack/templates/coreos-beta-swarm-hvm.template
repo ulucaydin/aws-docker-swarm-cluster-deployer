@@ -639,6 +639,63 @@
       }
     },
 
+    "cliROrole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "ec2.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "CLIROAccess",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "ec2:Describe*"
+                  ],
+                  "Resource": "*"
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "autoscaling:Describe*"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+          }
+        ],
+        "Path": "/"
+      }
+    },
+
+    "CLIROAccessProfile": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Path": "/",
+        "Roles": [
+          {
+            "Ref": "cliROrole"
+          }
+        ]
+      }
+    },
+
     "MasterLaunchConfiguration" : {
       "DependsOn" : [ "NAT" ],
       "Type" : "AWS::AutoScaling::LaunchConfiguration",
@@ -648,6 +705,7 @@
         "AssociatePublicIpAddress" : false,
         "KeyName" : { "Ref" : "KeyName"},
         "SecurityGroups" : [ { "Ref" : "MasterSecurityGroup"} ],
+        "IamInstanceProfile": {"Ref": "CLIROAccessProfile"},
         "UserData" :  { "Fn::Base64" : {"Fn::Join" : [ "", ["{{ master_cloud_config }}"] ]} }
       }
     },
