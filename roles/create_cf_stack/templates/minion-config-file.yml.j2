@@ -16,7 +16,7 @@
       content: |
         [Unit]
         Description=Swarm service
-        After=docker.service
+        After=ecr-credential-helper.service
 
         [Service]
         Restart=on-failure
