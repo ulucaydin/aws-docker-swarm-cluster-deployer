@@ -87,6 +87,10 @@
     "NodeHTTPCertARN" : {
       "Description" : "APllication Loadbalance Certificate ARN",
       "Type": "String"
+    },
+    "HostedZone" : {
+      "Description" : "HostedZone name",
+      "Type": "String"
     }
   },
 
@@ -852,6 +856,82 @@
         ]
       }
     },
+    "dnsResourceSet" : {
+      "Type" : "AWS::Route53::RecordSetGroup",
+      "DependsOn" : ["NodeHTTPLoadBalancer", "NodeHTTPTargetGroup"],
+      "Properties" : {
+        "HostedZoneName" : {
+          "Fn::Join" : [ "", [ { "Ref" : "HostedZone" }, "." ] ]
+        },
+        "Comment" : "DNS for hosted apps.",
+        "RecordSets" : [
+          {
+            "Name" : {
+              "Fn::Join" : [ "", [ "id", ".", {"Ref" : "HostedZone"} , "." ] ]
+            },
+            "Type" : "CNAME",
+            "TTL" : "900",
+            "ResourceRecords" : [ { "Fn::GetAtt" : ["NodeHTTPLoadBalancer","DNSName"] } ]
+          },
+          {
+            "Name" : {
+              "Fn::Join" : [ "", [ "galileo", ".", {"Ref" : "HostedZone"} , "." ] ]
+            },
+            "Type" : "CNAME",
+            "TTL" : "900",
+            "ResourceRecords" : [ { "Fn::GetAtt" : ["NodeHTTPLoadBalancer","DNSName"] } ]
+          },
+          {
+            "Name" : {
+              "Fn::Join" : [ "", [ "api", ".", {"Ref" : "HostedZone"} , "." ] ]
+            },
+            "Type" : "CNAME",
+            "TTL" : "900",
+            "ResourceRecords" : [ { "Fn::GetAtt" : ["NodeHTTPLoadBalancer","DNSName"] } ]
+          },
+          {
+            "Name" : {
+              "Fn::Join" : [ "", [ "collector", ".", {"Ref" : "HostedZone"} , "." ] ]
+            },
+            "Type" : "CNAME",
+            "TTL" : "900",
+            "ResourceRecords" : [ { "Fn::GetAtt" : ["NodeHTTPLoadBalancer","DNSName"] } ]
+          },
+          {
+            "Name" : {
+              "Fn::Join" : [ "", [ "gelato", ".", {"Ref" : "HostedZone"} , "." ] ]
+            },
+            "Type" : "CNAME",
+            "TTL" : "900",
+            "ResourceRecords" : [ { "Fn::GetAtt" : ["NodeHTTPLoadBalancer","DNSName"] } ]
+          },
+          {
+            "Name" : {
+              "Fn::Join" : [ "", [ "developer", ".", {"Ref" : "HostedZone"} , "." ] ]
+            },
+            "Type" : "CNAME",
+            "TTL" : "900",
+            "ResourceRecords" : [ { "Fn::GetAtt" : ["NodeHTTPLoadBalancer","DNSName"] } ]
+          },
+          {
+            "Name" : {
+              "Fn::Join" : [ "", [ "developer.gelato", ".", {"Ref" : "HostedZone"} , "." ] ]
+            },
+            "Type" : "CNAME",
+            "TTL" : "900",
+            "ResourceRecords" : [ { "Fn::GetAtt" : ["NodeHTTPLoadBalancer","DNSName"] } ]
+          },
+          {
+            "Name" : {
+              "Fn::Join" : [ "", [ "preview.gelato", ".", {"Ref" : "HostedZone"} , "." ] ]
+            },
+            "Type" : "CNAME",
+            "TTL" : "900",
+            "ResourceRecords" : [ { "Fn::GetAtt" : ["NodeHTTPLoadBalancer","DNSName"] } ]
+          }
+        ]
+      }
+    } 
   },
 
   "Outputs" : {
