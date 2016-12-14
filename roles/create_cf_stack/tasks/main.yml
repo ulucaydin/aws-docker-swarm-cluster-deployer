@@ -1,5 +1,9 @@
 ---
 
+- name: Generate the ssh key using the AWS CLI
+  script: files/generate_key.sh -r {{ cf_region }} -n {{ cf_stack_name }} -k "{{ aws_access_key }}" -s "{{ aws_secret_key }}"
+  ignore_errors: yes
+
 - name: Get a new Discovery Service url
   uri:
     url: "https://discovery.etcd.io/new?size={{ cf_master_cluster_size }}"
@@ -9,6 +13,7 @@
 - set_fact:
     master_cloud_config: "{{ lookup('template', '../templates/master-config-file.yml.j2') | replace('\r\n', '\\n') }}"
     minion_cloud_config: "{{ lookup('template', '../templates/minion-config-file.yml.j2') | replace('\r\n', '\\n') }}"
+    storage_cloud_config: "{{ lookup('template', '../templates/storage-config-file.yml.j2') | replace('\r\n', '\\n') }}"
 
 - set_fact:
     cf_template: "{{ lookup('template', 'coreos-beta-swarm-hvm.template') }}"
@@ -24,16 +29,26 @@
     aws_secret_key: "{{ aws_secret_key }}"
     template: "cf_template"
     region: "{{ cf_region }}"
+    disable_rollback: "{{ cf_disable_rollback }}"
     template_parameters:
+      EBSVolumeSize: "{{ cf_ebs_size }}"
       InstanceType: "{{ cf_instance_type }}"
       NodeClusterSize: "{{ cf_node_cluster_size }}"
       MasterClusterSize: "{{ cf_master_cluster_size }}"
-      KeyName: "{{ aws_keypair }}"
+      KeyName: "{{ cf_stack_name }}"
       DiscoveryURL: "{{ discovery_service_url.content }}"
       VpcAvailabilityZones: "{{ cf_vpc_azs }}"
+      AllowSSHFrom: "{{ ip_address }}"
+      NodeHTTPCertARN: "{{ certificate_arn }}"
+      HostedZone: "{{ parent_domain }}"
     tags:
       Stack: "ansible-cloudformation"
   register: stack_creation_response
+
+- name: Output the master ELB DNS to a file
+  template:
+    src: master-elb.j2
+    dest: ./master-elb
 
 - name: Stack Output
   debug: msg="{{ stack_creation_response.stack_outputs }}"

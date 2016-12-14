@@ -49,7 +49,7 @@ coreos:
         - name: 10-docker_opts.conf
           content: |
             [Service]
-            Environment=\"DOCKER_OPTS=--cluster-store=etcd://", { "Fn::GetAtt" : [ "InternalMasterLoadBalancer", "DNSName" ] }, ":2379  --cluster-advertise=eth0:4243\"
+            Environment=\"DOCKER_OPTS=--label=storage=true --cluster-store=etcd://", { "Fn::GetAtt" : [ "InternalMasterLoadBalancer", "DNSName" ] }, ":2379  --cluster-advertise=eth0:4243\"
             Restart=on-failure
             RestartSec=10
 
@@ -83,3 +83,22 @@ coreos:
         ExecStartPre=-/usr/bin/docker pull shashiranjan84/aws-ecr-helper:latest
         ExecStart=/usr/bin/docker run  --name ecr-cred-helper --rm -v /opt/bin:/go/src/github.com/awslabs/amazon-ecr-credential-helper/bin/local/ shashiranjan84/aws-ecr-helper:latest
         ExecStop=/usr/bin/docker  rmi shashiranjan84/aws-ecr-helper:latest
+
+    - name: rpc-statd.service
+      command: start
+      enable: true
+
+    - name: opt-mashape.mount
+      content: |
+        [Mount]
+        What=AZ_ZONE.",{ "Ref": "DataStorageFileSystem" },".efs.",{ "Ref": "AWS::Region" },".amazonaws.com:/
+        Where=/opt/mashape
+
+    - name: runcmd.service
+      command: start
+      content: |
+        [Unit]
+        Description=command
+        [Service]
+        Type=oneshot
+        ExecStart=/bin/sh -c 'export AZ_ZONE=$(curl -L http://169.254.169.254/latest/meta-data/placement/availability-zone) && sed -i \"s/AZ_ZONE/$AZ_ZONE/\" /etc/systemd/system/opt-mashape.mount && systemctl daemon-reload && systemctl restart opt-mashape.mount'
